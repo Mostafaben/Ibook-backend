@@ -23,6 +23,7 @@
     "node-mailer": "^0.1.1",
     "nodemailer": "^6.5.0",
     "random-string": "^0.2.0",
+    "randomstring": "^1.1.5",
     "sequelize": "^6.6.2"
   }
 }

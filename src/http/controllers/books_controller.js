@@ -15,10 +15,24 @@ const { book_image_url } = require('../../config/enviroment');
 const router = require('express').Router();
 const booksImagesPath = './../../uploads/books/';
 
+router.get('/', async (req, res) => {
+  try {
+    const { id_user } = req.user;
+    const books = await Book.findAll({
+      where: { UserId: id_user },
+      include: [
+        { model: Book_Images, required: false, attributes: ['image_url'] },
+      ],
+    });
+    res.status(200).send({ books });
+  } catch (error) {
+    handleHttpError(res, error, 400);
+  }
+});
+
 router.post('/', createBookMiddleware, async (req, res) => {
   try {
     const { image } = req.files;
-    console.log(req.user);
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
 
@@ -54,7 +68,7 @@ router.post('/', createBookMiddleware, async (req, res) => {
 router.delete('/:id_book', isOwner, async (req, res) => {
   try {
     const book = req.book;
-    console.log(book);
+
     const bookImage = await Book_Images.findOne({ where: { BookId: book.id } });
     fs.unlinkSync(bookImage.image_path);
     await book.destroy();
@@ -68,7 +82,7 @@ router.delete('/:id_book', isOwner, async (req, res) => {
 // update book
 router.patch('/:id_book', isOwner, async (req, res) => {
   try {
-    const { id_book } = req.params;
+    // const { id_book } = req.params;
     const book = req.book;
     const { name, author, etat } = req.body;
     if (etat) book.etat = etat;

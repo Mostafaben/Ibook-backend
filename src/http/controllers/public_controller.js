@@ -3,6 +3,7 @@ const { handleHttpError } = require('./../../utils/error_handlers');
 const booksPath = './../../uploads/books/';
 const usersPath = './../../uploads/users/';
 const path = require('path');
+const { Book, Book_Images } = require('../../models/book');
 
 router.get('/books/:image_name', (req, res) => {
   try {

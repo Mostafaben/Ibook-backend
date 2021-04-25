@@ -16,6 +16,8 @@ const {
 const {
   inscriptionMiddleware,
   loginMiddleware,
+  resetPassowrdRequestMiddleware,
+  resetPasswordMiddleware,
 } = require('../middlewares/authentication_middlewares');
 const {
   respondWithToken,
@@ -24,7 +26,7 @@ const {
 const { user_role } = require('../../enums/enums');
 const { authenticateUser } = require('../middlewares/authenticate_user');
 const { sendVerificationMail } = require('../../utils/mailing');
-const { default: cryptoRandomString } = require('crypto-random-string');
+const randomString = require('randomstring');
 
 // sign up
 router.post('/sign_up', inscriptionMiddleware, async (req, res) => {
@@ -72,7 +74,7 @@ router.post('/login', loginMiddleware, async (req, res) => {
 router.get('/verify_account_request', async (req, res) => {
   try {
     const { id_user } = req.user;
-    const code = cryptoRandomString({ length: 8 });
+    const code = randomString.generate({ length: 8 });
     const { email, name } = await User.findByPk(id_user);
 
     // save the code
@@ -88,7 +90,7 @@ router.get('/verify_account_request', async (req, res) => {
 
 router.get('/verify_account/:code', async (req, res) => {
   try {
-    const { code } = req.param;
+    const { code } = req.params;
     const { id_user } = req.user;
 
     const user_validation = await User_Validation.findOne({
