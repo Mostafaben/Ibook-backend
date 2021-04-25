@@ -13,7 +13,7 @@ router.use('/users', usersController);
 router.use('/books', authenticateUser, booksController);
 router.use('/interactions', authenticateUser, interactionsController);
 router.use('/profile', authenticateUser, profileController);
-router.use('/offer', authenticateUser, offersControllers);
+router.use('/offers', authenticateUser, offersControllers);
 router.use('/public', publicController);
 
 module.exports = router;

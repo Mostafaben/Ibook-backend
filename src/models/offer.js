@@ -56,6 +56,7 @@ Offer.hasMany(Offer_Exchange_Respond);
 Offer_Exchange_Respond.belongsTo(Book);
 Offer_Exchange_Respond.belongsTo(User);
 Offer_Sell_Respond.belongsTo(User);
+Offer.belongsTo(User);
 
 module.exports = {
   Offer,

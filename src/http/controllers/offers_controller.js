@@ -1,7 +1,15 @@
 const router = require('express').Router();
-const { body, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
+const { Op } = require('sequelize');
 const { offer_status } = require('../../enums/enums');
-const { Offer } = require('../../models/offer');
+const {
+  User,
+  User_Image,
+  Book,
+  Book_Images,
+  Offer,
+} = require('../../models/models');
+
 const {
   handleHttpError,
   handleMiddlewareErrors,
@@ -10,6 +18,36 @@ const {
   createOfferMiddleware,
   isOfferOwner,
 } = require('../middlewares/offers_middlewares');
+
+router.get('/', async (req, res) => {
+  try {
+    const { id_user } = req.user;
+    const offers = await Offer.findAll({
+      where: { UserId: { [Op.ne]: id_user } },
+      include: [
+        {
+          model: Book,
+          required: true,
+          include: [
+            { model: Book_Images, required: true, attributes: ['image_url'] },
+          ],
+        },
+        {
+          model: User,
+          required: true,
+          attributes: ['email', 'name'],
+          include: [
+            { model: User_Image, required: false, attributes: ['image_url'] },
+          ],
+        },
+      ],
+    });
+    console.log(offers);
+    res.status(200).send({ offers });
+  } catch (error) {
+    handleHttpError(res, error, 400);
+  }
+});
 
 // create offer
 router.post('/', createOfferMiddleware, async (req, res) => {
