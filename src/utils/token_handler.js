@@ -52,8 +52,24 @@ const generateToken = (id_user, role) => {
   );
 };
 
+function generateAdminToken(id_user) {
+  return jwt.sign(
+    { id_user, role: user_role.ADMIN, expiresIn: token_durration },
+    token_secret,
+    {
+      expiresIn: token_durration,
+    }
+  );
+}
+
+function generateAdminRefreshToken(id_user) {
+  return jwt.sign({ id_user, role: user_role.ADMIN }, refresh_token_secret);
+}
+
 module.exports = {
   respondWithToken,
   generateRefreshToken,
+  generateAdminRefreshToken,
+  generateAdminToken,
   generateToken,
 };

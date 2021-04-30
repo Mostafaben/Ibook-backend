@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { validationResult } = require('express-validator');
 const { Op } = require('sequelize');
+const { Sequelize } = require('../../config/db_config');
 const { offer_status } = require('../../enums/enums');
 const {
   User,
@@ -8,6 +9,7 @@ const {
   Book,
   Book_Images,
   Offer,
+  Offer_Likes,
 } = require('../../models/models');
 
 const {
@@ -19,12 +21,24 @@ const {
   isOfferOwner,
 } = require('../middlewares/offers_middlewares');
 
-router.get('/', async (req, res) => {
+router.get('/', async (_, res) => {
   try {
-    const { id_user } = req.user;
     const offers = await Offer.findAll({
-      where: { UserId: { [Op.ne]: id_user } },
+      subQuery: false,
+      where: {
+        offer_status: offer_status.ACTIVE,
+      },
+      attributes: {
+        include: [
+          [Sequelize.fn('COUNT', Sequelize.col('Offer_Likes.id')), 'likes'],
+        ],
+      },
       include: [
+        {
+          model: Offer_Likes,
+          required: false,
+          attributes: [],
+        },
         {
           model: Book,
           required: true,
@@ -42,7 +56,6 @@ router.get('/', async (req, res) => {
         },
       ],
     });
-    console.log(offers);
     res.status(200).send({ offers });
   } catch (error) {
     handleHttpError(res, error, 400);

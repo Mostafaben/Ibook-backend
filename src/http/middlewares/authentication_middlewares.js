@@ -30,9 +30,15 @@ const resetPasswordMiddleware = [
   body('code').isLength({ min: 8, max: 8 }),
 ];
 
+const authenticationAdminLoginMiddleware = [
+  body('email').isEmail(),
+  body('password').isLength({ min: 8 }),
+];
+
 module.exports = {
   inscriptionMiddleware,
   loginMiddleware,
   resetPassowrdRequestMiddleware,
   resetPasswordMiddleware,
+  authenticationAdminLoginMiddleware,
 };
