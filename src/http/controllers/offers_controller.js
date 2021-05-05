@@ -21,8 +21,12 @@ const {
   isOfferOwner,
 } = require('../middlewares/offers_middlewares');
 
-router.get('/', async (_, res) => {
+const pageElements = 10;
+
+router.get('/', async (req, res) => {
   try {
+    const { page } = req.query;
+
     const offers = await Offer.findAll({
       subQuery: false,
       where: {
@@ -55,8 +59,10 @@ router.get('/', async (_, res) => {
           ],
         },
       ],
+      limit: pageElements,
+      offset: page * pageElements,
     });
-    res.status(200).send({ offers });
+    res.status(200).send({ offers, page, pageElements });
   } catch (error) {
     handleHttpError(res, error, 400);
   }

@@ -38,4 +38,16 @@ router.post('/', authenticationAdminLoginMiddleware, async (req, res) => {
   }
 });
 
+router.post('/refresh_token', async (res, req) => {
+  try {
+    const { refreshToken } = req.body;
+    const user = await User.findOne({ where: { refresh_token: refreshToken } });
+    if (!user || user.role != user_role.ADMIN)
+      return handleHttpError(res, new Error('unauthorized'), 403);
+    res.status(200).send({ accessToken: generateAdminToken(user.id) });
+  } catch (error) {
+    handleHttpError(res, error, 400);
+  }
+});
+
 module.exports = router;
