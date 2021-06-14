@@ -5,17 +5,12 @@ const {
   handleHttpError,
   handleMiddlewareErrors,
 } = require('../../utils/error_handlers');
-const {
-  createBookMiddleware,
-  isOwner,
-} = require('../middlewares/book_middlewares');
 const path = require('path');
 const fs = require('fs');
 const { book_image_url } = require('../../config/enviroment');
-const router = require('express').Router();
 const booksImagesPath = './../../uploads/books/';
 
-router.get('/', async (req, res) => {
+async function getUserBooks(req, res) {
   try {
     const { id_user } = req.user;
     const books = await Book.findAll({
@@ -28,9 +23,9 @@ router.get('/', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-router.post('/', createBookMiddleware, async (req, res) => {
+async function createBook(req, res) {
   try {
     const { image } = req.files;
     const errors = validationResult(req);
@@ -62,10 +57,9 @@ router.post('/', createBookMiddleware, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// delete book
-router.delete('/:id_book', isOwner, async (req, res) => {
+async function deleteBookById(req, res) {
   try {
     const book = req.book;
 
@@ -77,10 +71,9 @@ router.delete('/:id_book', isOwner, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// update book
-router.patch('/:id_book', isOwner, async (req, res) => {
+async function updateBook(req, res) {
   try {
     // const { id_book } = req.params;
     const book = req.book;
@@ -93,10 +86,9 @@ router.patch('/:id_book', isOwner, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// update book cover
-router.patch('/cover/:id_book', isOwner, async (req, res) => {
+async function updateBookCover(req, res) {
   try {
     const { id_book } = req.params;
     const { image } = req.files;
@@ -108,6 +100,12 @@ router.patch('/cover/:id_book', isOwner, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-module.exports = router;
+module.exports = {
+  createBook,
+  getUserBooks,
+  updateBook,
+  updateBookCover,
+  deleteBookById,
+};

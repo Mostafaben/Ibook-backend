@@ -5,17 +5,12 @@ const {
   handleHttpError,
   handleMiddlewareErrors,
 } = require('../../utils/error_handlers');
-const {
-  updateAddressMiddleware,
-} = require('../middlewares/profile_middlewares');
-const router = require('./interactions_controller');
 const userImagePath = './../../uploads/user/';
 const fs = require('fs');
 const path = require('path');
 const { user_image_url } = require('../../config/enviroment');
 
-// update user address
-router.patch('/address', updateAddressMiddleware, async (req, res) => {
+async function updateUserAddress(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
@@ -37,10 +32,9 @@ router.patch('/address', updateAddressMiddleware, async (req, res) => {
   } catch (error) {
     return handleHttpError(res, error, 400);
   }
-});
+}
 
-// update user profile image
-router.patch('/profile_image', async (req, res) => {
+async function updateUserProfileImage(req, res) {
   try {
     const { id_user } = req.user;
     const { image } = req.files;
@@ -66,6 +60,6 @@ router.patch('/profile_image', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-module.exports = router;
+module.exports = { updateUserAddress, updateUserProfileImage };

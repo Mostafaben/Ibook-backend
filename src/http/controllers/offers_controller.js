@@ -1,6 +1,4 @@
-const router = require('express').Router();
 const { validationResult } = require('express-validator');
-const { Op } = require('sequelize');
 const { Sequelize } = require('../../config/db_config');
 const { offer_status } = require('../../enums/enums');
 const {
@@ -16,14 +14,10 @@ const {
   handleHttpError,
   handleMiddlewareErrors,
 } = require('../../utils/error_handlers');
-const {
-  createOfferMiddleware,
-  isOfferOwner,
-} = require('../middlewares/offers_middlewares');
 
-const pageElements = 10;
+const PAGE_ELEMENTS = 10;
 
-router.get('/', async (req, res) => {
+async function getOffers(req, res) {
   try {
     const { page } = req.query;
 
@@ -59,17 +53,16 @@ router.get('/', async (req, res) => {
           ],
         },
       ],
-      limit: pageElements,
-      offset: page * pageElements,
+      limit: PAGE_ELEMENTS,
+      offset: page * PAGE_ELEMENTS,
     });
-    res.status(200).send({ offers, page, pageElements });
+    res.status(200).send({ offers, page, PAGE_ELEMENTS });
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// create offer
-router.post('/', createOfferMiddleware, async (req, res) => {
+async function createOffer(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
@@ -80,20 +73,18 @@ router.post('/', createOfferMiddleware, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-//delete offer
-router.delete('/:id_offer', isOfferOwner, async (req, res) => {
+async function deleteOffer(req, res) {
   try {
     await req.offer.destroy();
     return res.status(200).send({ message: 'offer was deleted' });
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// cancel offer
-router.patch('/:id_offer', isOfferOwner, async (req, res) => {
+async function cancelOffer(req, res) {
   try {
     req.offer.offer_status = offer_status.CANCELED;
     await offer.save();
@@ -101,6 +92,6 @@ router.patch('/:id_offer', isOfferOwner, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-module.exports = router;
+module.exports = { cancelOffer, deleteOffer, createOffer, getOffers };

@@ -6,10 +6,9 @@ const {
   Offer,
   Book,
 } = require('./../../models/models');
-const router = require('express').Router();
 const pageElements = 10;
 
-router.get('/', async (req, res) => {
+async function getUsers(req, res) {
   try {
     const { page } = req.query;
 
@@ -30,9 +29,9 @@ router.get('/', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-router.get('/:id_user', async (req, res) => {
+async function getUserInformations(req, res) {
   try {
     const { id_user } = req.params;
     const user = await User.findByPk(id_user, {
@@ -67,6 +66,9 @@ router.get('/:id_user', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-module.exports = router;
+module.exports = {
+  getUserInformations,
+  getUsers,
+};

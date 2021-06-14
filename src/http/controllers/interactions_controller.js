@@ -6,10 +6,8 @@ const {
   Offer_Exchange_Respond,
 } = require('../../models/offer');
 const { handleHttpError } = require('../../utils/error_handlers');
-const router = require('express').Router();
 
-// like.unlike an offer
-router.get('/:id_offer', async (req, res) => {
+async function likeOffer(req, res) {
   try {
     const { id_offer } = req.params;
     const { id_user } = req.user;
@@ -26,10 +24,9 @@ router.get('/:id_offer', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// offer sell respond
-router.post('/:id_offer/sell', async (req, res) => {
+async function respondToSellOffer(req, res) {
   try {
     const { id_offer } = req.params;
     const { id_user } = req.user;
@@ -49,10 +46,9 @@ router.post('/:id_offer/sell', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// offer exchange respond
-router.post('/:id_offer/exchange', async (req, res) => {
+async function respondToExchangeOffer(req, res) {
   try {
     const { id_book } = req.body;
     const { id_offer } = req.params;
@@ -71,10 +67,9 @@ router.post('/:id_offer/exchange', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-//delete sell respond
-router.delete('/sell/:id_respond', async (req, res) => {
+async function deleteSellRespondById(req, res) {
   try {
     const { id_respond } = req.params;
     const { id_user } = req.user;
@@ -88,10 +83,9 @@ router.delete('/sell/:id_respond', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// delete exchange respond
-router.delete('/exchange/:id_respond', async (req, res) => {
+async function deleteExchangeRespondById(req, res) {
   try {
     const { id_respond } = req.params;
     const { id_user } = req.user;
@@ -105,6 +99,12 @@ router.delete('/exchange/:id_respond', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-module.exports = router;
+module.exports = {
+  deleteExchangeRespondById,
+  deleteSellRespondById,
+  respondToExchangeOffer,
+  respondToSellOffer,
+  likeOffer,
+};

@@ -1,19 +1,23 @@
 const router = require('express').Router();
+
 const authenticationRouter = require('./routers/admin_authentication_router');
-const usersController = require('./controllers/users_controller');
-const booksController = require('./controllers/books_controller');
-const offersControllers = require('./controllers/offers_controller');
-const publicController = require('./controllers/public_controller');
-const { authenticateUser } = require('./middlewares/authenticate_user');
-const interactionsController = require('./controllers/interactions_controller');
-const profileController = require('./controllers/profile_controller');
+const usersRouter = require('./routers/users_router');
+const booksRouter = require('./routers/books_router');
+const offersRouter = require('./routers/offers_router');
+const publicRouter = require('./routers/public_router');
+const {
+  authenticateUser,
+  authenticateAdmin,
+} = require('./middlewares/authenticate_user');
+const interactionsRouter = require('./routers/interactions_router');
+const profileRouter = require('./routers/profile_router');
 
 router.use('/auth', authenticationRouter);
-router.use('/users', usersController);
-router.use('/books', authenticateUser, booksController);
-router.use('/interactions', authenticateUser, interactionsController);
-router.use('/profile', authenticateUser, profileController);
-router.use('/offers', authenticateUser, offersControllers);
-router.use('/public', publicController);
+router.use('/users', authenticateAdmin, usersRouter);
+router.use('/profile', authenticateUser, profileRouter);
+router.use('/offers', authenticateUser, offersRouter);
+router.use('/books', authenticateUser, booksRouter);
+router.use('/interactions', authenticateUser, interactionsRouter);
+router.use('/public', publicRouter);
 
 module.exports = router;
