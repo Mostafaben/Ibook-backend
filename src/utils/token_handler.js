@@ -4,9 +4,8 @@ const {
   token_secret,
   refresh_token_secret,
 } = require('./../config/enviroment');
-const { User } = require('./../models/models');
 
-const respondWithToken = async (user, role, res) => {
+async function respondWithToken(user, role, res) {
   const id_user = user.id;
   const accessToken = generateToken(id_user, role);
   const expiresAt = parseInt(token_durration);
@@ -22,9 +21,9 @@ const respondWithToken = async (user, role, res) => {
       expiresAt: expiresAt,
     },
   });
-};
+}
 
-const generateRefreshToken = async (user, role) => {
+async function generateRefreshToken(user, role) {
   const refreshToken = jwt.sign(
     {
       id_user: user.id,
@@ -36,9 +35,9 @@ const generateRefreshToken = async (user, role) => {
   await user.save({ fields: ['refresh_token'] });
 
   return refreshToken;
-};
+}
 
-const generateToken = (id_user, role) => {
+function generateToken(id_user, role) {
   const tokenDuration = parseInt(token_durration);
   return jwt.sign(
     {
@@ -50,7 +49,7 @@ const generateToken = (id_user, role) => {
       expiresIn: `${tokenDuration}s`,
     }
   );
-};
+}
 
 function generateAdminToken(id_user) {
   return jwt.sign(

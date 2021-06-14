@@ -6,15 +6,15 @@ const {
   Offer,
   Book,
 } = require('./../../models/models');
-const pageElements = 10;
+const PAGE_ELEMENTS = 10;
 
 async function getUsers(req, res) {
   try {
     const { page } = req.query;
 
     const users = await User.findAll({
-      limit: pageElements,
-      offset: pageElements * page,
+      limit: PAGE_ELEMENTS,
+      offset: PAGE_ELEMENTS * page,
       attributes: ['name', 'email', 'createdAt', 'updatedAt', 'is_verified'],
       include: [
         {
@@ -25,7 +25,7 @@ async function getUsers(req, res) {
         },
       ],
     });
-    res.status(200).send({ users, pageElements, page });
+    res.status(200).send({ users, PAGE_ELEMENTS, page });
   } catch (error) {
     handleHttpError(res, error, 400);
   }

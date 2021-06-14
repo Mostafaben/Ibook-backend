@@ -1,12 +1,12 @@
 const transporter = require('../config/mail_config');
 
 async function sendVerificationMail(email, name, code) {
-  return await transporter.sendMail({
+  return transporter.sendMail({
     from: 'fm_benlagha@esi.dz',
     to: email,
-    subject: 'Accout validation',
+    subject: `${name}, Accout validation`,
     text: code,
-    sender: 'Ibook',
+    sender: 'Ibook Website',
   });
 }
 
