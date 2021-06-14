@@ -76,8 +76,4 @@ const User_Reset_Password = sequelize.define(
   { timestamps: true }
 );
 
-User_Validation.belongsTo(User);
-User_Image.belongsTo(User);
-User.hasMany(User_Image);
-
 module.exports = { User, User_Image, User_Validation, User_Reset_Password };

@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const {
   handleHttpError,
   handleMiddlewareErrors,
@@ -14,22 +13,14 @@ const {
   comparePassword,
 } = require('./../../utils/passwordsHandler');
 const {
-  inscriptionMiddleware,
-  loginMiddleware,
-  resetPassowrdRequestMiddleware,
-  resetPasswordMiddleware,
-} = require('../middlewares/authentication_middlewares');
-const {
   respondWithToken,
   generateToken,
 } = require('../../utils/token_handler');
 const { user_role } = require('../../enums/enums');
-const { authenticateUser } = require('../middlewares/authenticate_user');
 const { sendVerificationMail } = require('../../utils/mailing');
 const randomString = require('randomstring');
 
-// sign up
-router.post('/sign_up', inscriptionMiddleware, async (req, res) => {
+async function signUpUser(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -46,10 +37,9 @@ router.post('/sign_up', inscriptionMiddleware, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-// login
-router.post('/login', loginMiddleware, async (req, res) => {
+async function loginUser(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -69,9 +59,9 @@ router.post('/login', loginMiddleware, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-router.get('/verify_account_request', async (req, res) => {
+async function requestVerifyAccount(req, res) {
   try {
     const { id_user } = req.user;
     const code = randomString.generate({ length: 8 });
@@ -86,9 +76,9 @@ router.get('/verify_account_request', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-router.get('/verify_account/:code', async (req, res) => {
+async function verifyAccount(req, res) {
   try {
     const { code } = req.params;
     const { id_user } = req.user;
@@ -117,10 +107,9 @@ router.get('/verify_account/:code', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-//
-router.post('/refresh_token', async (req, res) => {
+async function refreshUserToken(req, res) {
   try {
     const { refreshToken } = req.body;
     const user = await User.findOne({ where: { refresh_token: refreshToken } });
@@ -134,10 +123,10 @@ router.post('/refresh_token', async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
 //
-router.patch('/logout', authenticateUser, async (req, res) => {
+async function logoutUser(req, res) {
   try {
     const { id } = req.user;
     const user = await User.findByPk(id);
@@ -147,33 +136,29 @@ router.patch('/logout', authenticateUser, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-router.post(
-  '/reset_password_request',
-  resetPassowrdRequestMiddleware,
-  async (req, res) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors, 400);
+async function requestResetPassword(req, res) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors, 400);
 
-      const { email } = req.body;
-      const user = await User.findOne({ where: { email } });
-      if (!user)
-        return handleHttpError(res, new Error('user was not found'), 404);
-      const code = cryptoRandomString({ length: 8 });
-      await User_Reset_Password.create({
-        email,
-        code,
-      });
-      return res.status(201).send({ message: 'check your email' });
-    } catch (error) {
-      handleHttpError(res, error, 400);
-    }
+    const { email } = req.body;
+    const user = await User.findOne({ where: { email } });
+    if (!user)
+      return handleHttpError(res, new Error('user was not found'), 404);
+    const code = cryptoRandomString({ length: 8 });
+    await User_Reset_Password.create({
+      email,
+      code,
+    });
+    return res.status(201).send({ message: 'check your email' });
+  } catch (error) {
+    handleHttpError(res, error, 400);
   }
-);
+}
 
-router.post('/reset_passwod', resetPasswordMiddleware, async (req, res) => {
+async function resetUserPassword(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors, 400);
@@ -201,6 +186,15 @@ router.post('/reset_passwod', resetPasswordMiddleware, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-module.exports = router;
+module.exports = {
+  loginUser,
+  signUpUser,
+  refreshUserToken,
+  requestResetPassword,
+  requestVerifyAccount,
+  verifyAccount,
+  resetUserPassword,
+  logoutUser,
+};

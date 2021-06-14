@@ -1,17 +1,14 @@
 const router = require('express').Router();
-const authenticationController = require('./controllers/authentication_controller');
+const authenticationRouter = require('./routers/admin_authentication_router');
 const usersController = require('./controllers/users_controller');
 const booksController = require('./controllers/books_controller');
 const offersControllers = require('./controllers/offers_controller');
 const publicController = require('./controllers/public_controller');
-const {
-  authenticateUser,
-  authenticateAdmin,
-} = require('./middlewares/authenticate_user');
+const { authenticateUser } = require('./middlewares/authenticate_user');
 const interactionsController = require('./controllers/interactions_controller');
 const profileController = require('./controllers/profile_controller');
 
-router.use('/auth', authenticationController);
+router.use('/auth', authenticationRouter);
 router.use('/users', usersController);
 router.use('/books', authenticateUser, booksController);
 router.use('/interactions', authenticateUser, interactionsController);

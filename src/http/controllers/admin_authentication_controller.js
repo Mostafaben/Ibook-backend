@@ -4,15 +4,11 @@ const {
   handleMiddlewareErrors,
 } = require('../../utils/error_handlers');
 const { User } = require('./../../models/models');
-const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const { user_role } = require('../../enums/enums');
 const { generateAdminToken } = require('../../utils/token_handler');
-const {
-  authenticationAdminLoginMiddleware,
-} = require('../middlewares/authentication_middlewares');
 
-router.post('/', authenticationAdminLoginMiddleware, async (req, res) => {
+async function adminLogin(req, res) {
   try {
     const errros = validationResult(req);
     if (!errros.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
@@ -36,9 +32,9 @@ router.post('/', authenticationAdminLoginMiddleware, async (req, res) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-router.post('/refresh_token', async (res, req) => {
+async function refreshToken(res, req) {
   try {
     const { refreshToken } = req.body;
     const user = await User.findOne({ where: { refresh_token: refreshToken } });
@@ -48,6 +44,6 @@ router.post('/refresh_token', async (res, req) => {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
-});
+}
 
-module.exports = router;
+module.exports = { refreshToken, adminLogin };

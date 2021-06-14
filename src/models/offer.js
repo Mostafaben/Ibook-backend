@@ -1,7 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./../config/db_config');
-const { Book } = require('./book');
-const { User } = require('./user');
 const { respond_status, offer_status } = require('./../enums/enums');
 
 const Offer = sequelize.define(
@@ -46,17 +44,6 @@ const Offer_Exchange_Respond = sequelize.define(
 );
 
 const Offer_Likes = sequelize.define('Offer_Likes', {}, { timestamps: true });
-
-// relations
-Offer.belongsTo(Book);
-Offer.hasMany(Offer_Likes);
-Offer_Likes.belongsTo(User);
-Offer.hasMany(Offer_Sell_Respond);
-Offer.hasMany(Offer_Exchange_Respond);
-Offer_Exchange_Respond.belongsTo(Book);
-Offer_Exchange_Respond.belongsTo(User);
-Offer_Sell_Respond.belongsTo(User);
-Offer.belongsTo(User);
 
 module.exports = {
   Offer,

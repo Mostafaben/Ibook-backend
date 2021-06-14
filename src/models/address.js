@@ -15,7 +15,4 @@ const Wilaya = sequelize.define('Wilaya', {
   code: { type: DataTypes.INTEGER, allowNull: false },
 });
 
-Wilaya.hasMany(Address);
-Address.belongsTo(User);
-
 module.exports = { Address, Wilaya };

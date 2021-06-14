@@ -1,7 +1,7 @@
 const sequelize = require('./../config/db_config');
 const { DataTypes } = require('sequelize');
-const { User } = require('./user');
 const { book_state } = require('../enums/enums');
+const { User } = require('./models');
 
 const Book = sequelize.define(
   'Book',
@@ -37,8 +37,5 @@ const Book_Images = sequelize.define('Book_Images', {
   image_name: { type: DataTypes.STRING, allowNull: false },
   image_url: { type: DataTypes.STRING, allowNull: false },
 });
-
-Book.hasMany(Book_Images);
-Book.belongsTo(User);
 
 module.exports = { Book, Book_Images };
