@@ -16,6 +16,9 @@ const mail_port = process.env.Mail_;
 const mail_user = process.env.Mail_;
 const mail_pass = process.env.Mail_;
 const mail_host = process.env.Mail_;
+const adminName = process.env.ADMIN_NAME;
+const adminEmail = process.env.ADMIN_EMAIL;
+const adminPassword = process.env.ADMIN_PASSWORD;
 
 module.exports = {
   port,
@@ -34,4 +37,7 @@ module.exports = {
   mail_user,
   mail_pass,
   author_image_url,
+  adminEmail,
+  adminName,
+  adminPassword,
 };

@@ -7,6 +7,7 @@ const { User } = require('./../../models/models');
 const bcrypt = require('bcrypt');
 const { user_role } = require('../../enums/enums');
 const { generateAdminToken } = require('../../utils/token_handler');
+const { hashPassword } = require('../../utils/passwordsHandler');
 
 async function adminLogin(req, res) {
   try {
