@@ -14,7 +14,9 @@ async function isOwner(req, res, next) {
     const { id_book } = req.params;
     const { id_user } = req.user;
     const book = await Book.findByPk(id_book);
-    if (book?.UserId != id_user)
+    if (!book)
+      return handleHttpError(res, new Error('book does not exists'), 404);
+    if (book.UserId != id_user)
       return handleHttpError(res, new Error('unauthorized'), 403);
     req.book = book;
     next();

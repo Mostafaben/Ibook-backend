@@ -16,6 +16,7 @@ async function getUserBooks(req, res) {
     const { id_user } = req.user;
     const books = await Book.findAll({
       where: { UserId: id_user },
+      attributes: { exclude: ['UserId'] },
       include: [
         { model: Book_Images, required: false, attributes: ['image_url'] },
       ],
@@ -72,7 +73,6 @@ async function addImageToBook(bookName, idBook, image) {
 async function deleteBookById(req, res) {
   try {
     const book = req.book;
-
     const bookImage = await Book_Images.findOne({ where: { BookId: book.id } });
     fs.unlinkSync(bookImage.image_path);
     await book.destroy();
