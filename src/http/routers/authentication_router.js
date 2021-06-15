@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { get, patch, post } = router;
+
 const {
   loginUser,
   signUpUser,
@@ -17,17 +17,17 @@ const {
   resetPasswordMiddleware,
 } = require('../middlewares/authentication_middlewares');
 
-post('/sign_up', inscriptionMiddleware, signUpUser);
-post('/login', loginMiddleware, loginUser);
-get('/verify_account_request', requestVerifyAccount);
-get('/verify_account/:code', verifyAccount);
-post('/refresh_token', refreshUserToken);
-patch('/logout', logoutUser);
-post(
+router.post('/sign_up', inscriptionMiddleware, signUpUser);
+router.post('/login', loginMiddleware, loginUser);
+router.get('/verify_account_request', requestVerifyAccount);
+router.get('/verify_account/:code', verifyAccount);
+router.post('/refresh_token', refreshUserToken);
+router.patch('/logout', logoutUser);
+router.post(
   '/reset_password_request',
   resetPassowrdRequestMiddleware,
   requestResetPassword
 );
-post('/reset_passwod', resetPasswordMiddleware, resetUserPassword);
+router.post('/reset_passwod', resetPasswordMiddleware, resetUserPassword);
 
 module.exports = router;

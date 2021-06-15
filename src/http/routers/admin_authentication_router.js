@@ -7,7 +7,7 @@ const {
   refreshToken,
 } = require('../controllers/admin_authentication_controller');
 
-router.post('/', authenticationAdminLoginMiddleware, adminLogin);
+router.post('/login', authenticationAdminLoginMiddleware, adminLogin);
 router.post('/refresh_token', refreshToken);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 const { body } = require('express-validator');
-const { Book } = require('../../models/book');
+const { Book, Book_Images } = require('../../models/book');
 const { handleHttpError } = require('../../utils/error_handlers');
 
 const createBookMiddleware = [
@@ -10,13 +10,32 @@ const createBookMiddleware = [
 ];
 
 async function isOwner(req, res, next) {
-  const { id_book } = req.params;
-  const { id_user } = req.user;
-  const book = await Book.findByPk(id_book);
-  if (book?.UserId != id_user)
-    return handleHttpError(res, new Error('unauthorized'), 403);
-  req.book = book;
-  next();
+  try {
+    const { id_book } = req.params;
+    const { id_user } = req.user;
+    const book = await Book.findByPk(id_book);
+    if (book?.UserId != id_user)
+      return handleHttpError(res, new Error('unauthorized'), 403);
+    req.book = book;
+    next();
+  } catch (error) {
+    return handleHttpError(res, error, 400);
+  }
 }
 
-module.exports = { createBookMiddleware, isOwner };
+async function isBookOwner(req, res, next) {
+  try {
+    const { id_image } = req.params;
+    const { id_user } = req.user;
+    const bookImage = await Book_Images.findByPk(id_image);
+    const book = await Book.findByPk(bookImage.BookId);
+    if (book?.UserId != id_user)
+      return handleHttpError(res, new Error('unauthorized'), 403);
+    req.book = book;
+    next();
+  } catch (error) {
+    handleHttpError(res, error, 400);
+  }
+}
+
+module.exports = { createBookMiddleware, isOwner, isBookOwner };

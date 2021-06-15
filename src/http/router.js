@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
-const authenticationRouter = require('./routers/admin_authentication_router');
+const adminAuthenticationRouter = require('./routers/admin_authentication_router');
+const authenticationRouter = require('./routers/authentication_router');
 const usersRouter = require('./routers/users_router');
 const booksRouter = require('./routers/books_router');
 const offersRouter = require('./routers/offers_router');
@@ -12,7 +13,8 @@ const {
 const interactionsRouter = require('./routers/interactions_router');
 const profileRouter = require('./routers/profile_router');
 
-router.use('/auth', authenticationRouter);
+router.use('/auth/admin', adminAuthenticationRouter);
+router.use('/auth/user', authenticationRouter);
 router.use('/users', authenticateAdmin, usersRouter);
 router.use('/profile', authenticateUser, profileRouter);
 router.use('/offers', authenticateUser, offersRouter);
