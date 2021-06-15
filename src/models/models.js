@@ -15,6 +15,7 @@ const {
 } = require('./offer');
 
 const { Wilaya, Address } = require('./address');
+const { Author } = require('./author');
 
 module.exports = {
   User,
@@ -29,4 +30,5 @@ module.exports = {
   User_Reset_Password,
   Offer_Exchange_Respond,
   Offer_Sell_Respond,
+  Author,
 };

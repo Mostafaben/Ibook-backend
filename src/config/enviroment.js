@@ -10,6 +10,7 @@ const token_durration = process.env.TOKEN_DURRATION;
 const token_secret = process.env.TOKEN_SECRET;
 const refresh_token_secret = process.env.REFRESH_TOKEN_SECRET;
 const book_image_url = `${host}:${port}/api/public/books/`;
+const author_image_url = `${host}:${port}/api/public/authors/`;
 const user_image_url = `${host}:${port}/api/public/users/`;
 const mail_port = process.env.Mail_;
 const mail_user = process.env.Mail_;
@@ -32,4 +33,5 @@ module.exports = {
   mail_port,
   mail_user,
   mail_pass,
+  author_image_url,
 };

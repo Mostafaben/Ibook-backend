@@ -7,8 +7,10 @@ const {
 } = require('../../utils/error_handlers');
 const path = require('path');
 const fs = require('fs');
-const { book_image_url } = require('../../config/enviroment');
-const booksImagesPath = './../../uploads/books/';
+const { book_image_url, author_image_url } = require('../../config/enviroment');
+const { Author } = require('../../models/author');
+const BOOKS_IMAGES_PATH = './../../uploads/books/';
+const AUTHOR_IMAGES_PATH = './../../uploads/authors/';
 const MAX_IMAGES = 5;
 
 async function getUserBooks(req, res) {
@@ -27,6 +29,60 @@ async function getUserBooks(req, res) {
   }
 }
 
+async function checkIfAuthorExists(authorName) {
+  return Author.findOne({ where: { name: authorName } });
+}
+
+async function addNewAuthor(authorName) {
+  authorName = authorName.trim().toLowerCase();
+  const author = await checkIfAuthorExists(authorName);
+  if (author) return author;
+  return Author.create({ name: authorName });
+}
+
+async function createAuthor(req, res) {
+  try {
+    const { authorName, resume } = req.body;
+    const { image } = req.files;
+    authorName = authorName.trim().toLowerCase();
+    const author = await checkIfAuthorExists(authorName);
+
+    if (author)
+      return handleHttpError(res, new Error('author already exists'), 400);
+
+    if (!image || !isImage(image.path))
+      return Author.create({ name: authorName, resume: resume });
+
+    const { imageName, outputPath } = storeAuthorImage(image, authorName);
+
+    return Author.create({
+      name: authorName,
+      resume: resume,
+      image_path: outputPath,
+      image_url: author_image_url + imageName,
+      image_name: imageName,
+    });
+  } catch (error) {
+    handleHttpError(res, error, 400);
+  }
+}
+
+function storeAuthorImage(image, authorName) {
+  const imageName = generateUniqueAuthorName(authorName);
+  const outputPath = path.join(__dirname, AUTHOR_IMAGES_PATH + imageName);
+  fs.renameSync(image.path, outputPath);
+  return { imageName, outputPath };
+}
+
+function generateUniqueAuthorName(authorName) {
+  return authorName.replace(/ /g, '-') + Date.now() + path.extname(image.path);
+}
+
+async function addAuthorToBook(book, idAuthor) {
+  book.AuthorId = idAuthor;
+  return book.save();
+}
+
 async function createBook(req, res) {
   try {
     const { image } = req.files;
@@ -35,14 +91,23 @@ async function createBook(req, res) {
     if (!isImage(image.path))
       return handleHttpError(res, new Error('image is required'), 400);
     const { id_user } = req.user;
-    const { name, author, etat, summary } = req.body;
+    const { name, authorName, etat, summary } = req.body;
+
+    let id_author = null;
+
+    if (authorName) {
+      const author = await addNewAuthor(authorName);
+      id_author = author.id;
+    }
+
     const book = await Book.create({
       name,
-      author,
+      AuthorId: id_author,
       etat,
       UserId: id_user,
       summary,
     });
+
     const bookImage = await addImageToBook(name, book.id, image);
     return res.status(201).send({ book, bookImage });
   } catch (error) {
@@ -55,7 +120,7 @@ function generateBookImageName(bookName, image, idBook) {
 }
 
 function generateBookImagePath(imageName) {
-  return path.join(__dirname, booksImagesPath + imageName);
+  return path.join(__dirname, BOOKS_IMAGES_PATH + imageName);
 }
 
 async function addImageToBook(bookName, idBook, image) {

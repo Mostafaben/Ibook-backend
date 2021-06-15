@@ -11,11 +11,13 @@ const {
   Offer_Exchange_Respond,
   Offer_Sell_Respond,
   User_Reset_Password,
+  Author,
 } = require('./models');
 
 // book associations
 Book.hasMany(Book_Images);
 Book.belongsTo(User);
+Author.hasMany(Book);
 
 // user associations
 User_Validation.belongsTo(User);
