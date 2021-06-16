@@ -2,9 +2,10 @@ const { validationResult } = require('express-validator');
 const isImage = require('is-image');
 const { User_Image, Address, User } = require('../../models/models');
 const {
-  handleHttpError,
+  HttpErrorHandler,
   handleMiddlewareErrors,
   HttpErrorHandler,
+  HttpError,
 } = require('../../utils/error_handlers');
 const userImagePath = './../../uploads/user/';
 const fs = require('fs');
@@ -34,7 +35,7 @@ async function updateUserAddress(req, res) {
     }
     return res.status(201).send({ userAddress });
   } catch (error) {
-    return handleHttpError(res, error, 400);
+    return HttpErrorHandler(res, error);
   }
 }
 
@@ -44,26 +45,27 @@ async function updateUserProfileImage(req, res) {
       user: { id_user },
       files: { image },
     } = req;
-    if (!isImage(image.path)) throw new Error('image is required');
+    if (!isImage(image.path)) throw new HttpError('image is required');
     let userImage = await User_Image.findOne({ where: { UserId: id_user } });
-    if (!userImage) {
-      const image_name = id_user + path.extname(image.path);
-      const image_path = path.join(__dirname, userImagePath + image_name);
-      fs.renameSync(image.path, image_path);
-      const image_url = user_image_url + image_name;
-      userImage = await User_Image.create({
-        image_path,
-        image_name,
-        image_url,
-        UserId: id_user,
-      });
-    } else {
-      fs.renameSync(image.path, userImage.image_path);
-    }
+    if (!userImage) await storeUserImage(image, id_user);
+    else fs.renameSync(image.path, userImage.image_path);
     return res.status(201).send({ userImage });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
+}
+
+async function storeUserImage(image, id_user) {
+  const image_name = id_user + path.extname(image.path);
+  const image_path = path.join(__dirname, userImagePath + image_name);
+  fs.renameSync(image.path, image_path);
+  const image_url = user_image_url + image_name;
+  return User_Image.create({
+    image_path,
+    image_name,
+    image_url,
+    UserId: id_user,
+  });
 }
 
 async function updateUserInformations(req, res) {
