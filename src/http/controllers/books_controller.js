@@ -42,8 +42,11 @@ async function addNewAuthor(authorName) {
 
 async function createAuthor(req, res) {
   try {
-    const { authorName, resume } = req.body;
-    const { image } = req.files;
+    const {
+      body: { authorName, resume },
+      files: { image },
+    } = req;
+
     authorName = authorName.trim().toLowerCase();
     const author = await checkIfAuthorExists(authorName);
 
@@ -150,11 +153,13 @@ async function deleteBookById(req, res) {
 
 async function updateBook(req, res) {
   try {
-    const book = req.book;
-    const { name, author, etat } = req.body;
+    const {
+      body: { name, AuthorId, etat },
+      book,
+    } = req;
     if (etat) book.etat = etat;
     if (name) book.name = name;
-    if (author) book.author = author;
+    if (AuthorId) book.AuthorId = AuthorId;
     await book.save();
     res.status(200).send({ book });
   } catch (error) {
@@ -175,8 +180,10 @@ async function deleteBookImage(req, res) {
 
 async function updateBookCover(req, res) {
   try {
-    const { id_book } = req.params;
-    const { image } = req.files;
+    const {
+      params: { id_book },
+      files: { image },
+    } = req.params;
     if (!isImage(image.path))
       return handleHttpError(res, new Error('image is required'), 400);
     const bookImage = await Book_Images.findOne({ where: { BookId: id_book } });
@@ -189,8 +196,10 @@ async function updateBookCover(req, res) {
 
 async function addBookImage(req, res) {
   try {
-    const { name, id } = req.book;
-    const { image } = req.files;
+    const {
+      book: { name, id },
+      files: { image },
+    } = req;
 
     if (!image || !isImage(image.path))
       return handleHttpError(res, new Error('image is required'), 400);
@@ -223,4 +232,5 @@ module.exports = {
   deleteBookById,
   deleteBookImage,
   addBookImage,
+  addAuthorToBook,
 };

@@ -12,10 +12,12 @@ const {
 } = require('./middlewares/authenticate_user');
 const interactionsRouter = require('./routers/interactions_router');
 const profileRouter = require('./routers/profile_router');
+const authorsRouter = require('./routers/authors_router');
 
 router.use('/auth/admin', adminAuthenticationRouter);
 router.use('/auth/user', authenticationRouter);
 router.use('/users', authenticateAdmin, usersRouter);
+router.use('/author', authenticateAdmin, authorsRouter);
 router.use('/profile', authenticateUser, profileRouter);
 router.use('/offers', authenticateUser, offersRouter);
 router.use('/books', authenticateUser, booksRouter);

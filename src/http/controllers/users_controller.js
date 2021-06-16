@@ -6,13 +6,18 @@ const {
   Offer,
   Book,
 } = require('./../../models/models');
+const { Op } = require('sequelize');
+const { user_role } = require('../../enums/enums');
 const PAGE_ELEMENTS = 10;
 
 async function getUsers(req, res) {
   try {
-    const { page } = req.query;
+    let { page } = req.query;
+
+    if (!page) page = 0;
 
     const users = await User.findAll({
+      where: { role: { [Op.ne]: user_role.ADMIN } },
       limit: PAGE_ELEMENTS,
       offset: PAGE_ELEMENTS * page,
       attributes: ['name', 'email', 'createdAt', 'updatedAt', 'is_verified'],

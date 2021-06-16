@@ -5,6 +5,8 @@ const {
   refresh_token_secret,
 } = require('./../config/enviroment');
 
+const { user_role } = require('../enums/enums');
+
 async function respondWithToken(user, role, res) {
   const id_user = user.id;
   const accessToken = generateToken(id_user, role);
@@ -56,7 +58,7 @@ function generateAdminToken(id_user) {
     { id_user, role: user_role.ADMIN, expiresIn: token_durration },
     token_secret,
     {
-      expiresIn: token_durration,
+      expiresIn: `${token_durration}s`,
     }
   );
 }

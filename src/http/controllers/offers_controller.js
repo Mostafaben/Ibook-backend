@@ -66,8 +66,10 @@ async function createOffer(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
-    const { id_user } = req.user;
-    const { BookId, offer_type } = req.body;
+    const {
+      user: { id_user },
+      body: { BookId, offer_type },
+    } = req;
     const offer = await Offer.create({ BookId, offer_type, UserId: id_user });
     return res.status(201).send({ offer });
   } catch (error) {

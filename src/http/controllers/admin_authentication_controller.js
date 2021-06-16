@@ -6,8 +6,14 @@ const {
 const { User } = require('./../../models/models');
 const bcrypt = require('bcrypt');
 const { user_role } = require('../../enums/enums');
-const { generateAdminToken } = require('../../utils/token_handler');
-const { hashPassword } = require('../../utils/passwordsHandler');
+const {
+  generateAdminToken,
+  generateAdminRefreshToken,
+} = require('../../utils/token_handler');
+const {
+  hashPassword,
+  comparePassword,
+} = require('../../utils/passwordsHandler');
 
 async function adminLogin(req, res) {
   try {
@@ -15,15 +21,15 @@ async function adminLogin(req, res) {
     if (!errros.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+
     if (!user) {
       return handleHttpError(res, new Error('user was not found'), 404);
     }
-    if (
-      !bcrypt.compareSync(password, user.password) ||
-      user.role != user_role.ADMIN
-    ) {
+
+    if (!checkIdentity(user, password)) {
       return handleHttpError(res, new Error('unautorized'), 403);
     }
+
     const accessToken = generateAdminToken(user.id);
     const refreshToken = generateAdminRefreshToken(user.id);
     user.refresh_token = refreshToken;
@@ -33,6 +39,12 @@ async function adminLogin(req, res) {
   } catch (error) {
     handleHttpError(res, error, 400);
   }
+}
+
+function checkIdentity(user, password) {
+  return (
+    comparePassword(password, user.password) && user.role == user_role.ADMIN
+  );
 }
 
 async function refreshToken(res, req) {

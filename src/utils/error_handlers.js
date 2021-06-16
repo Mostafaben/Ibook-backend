@@ -6,7 +6,7 @@ function handleHttpError(res, error, code) {
 }
 
 function handleMiddlewareErrors(res, errors, code) {
-  return res.status(code).send({ success: false, errors });
+  return res.status(code).send({ success: false, ...errors });
 }
 
 module.exports = {

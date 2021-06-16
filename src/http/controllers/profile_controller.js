@@ -14,21 +14,24 @@ async function updateUserAddress(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
-    const { id_user } = req.user;
-    const { id_wilaya, address } = req.body;
-    let adr = await Address.findOne({ where: { UserId: id_user } });
-    if (adr) {
-      adr.WilayaId = id_wilayal;
-      adr.address = address;
-      await adr.save();
+    const {
+      user: { id_user },
+      body: { id_wilaya, address },
+    } = req;
+
+    let userAddress = await Address.findOne({ where: { UserId: id_user } });
+    if (userAddress) {
+      userAddress.WilayaId = id_wilayal;
+      userAddress.address = address;
+      await userAddress.save();
     } else {
-      adr = await Address.create({
+      userAddress = await Address.create({
         UserId: id_user,
         WilayaId: id_wilaya,
         address,
       });
     }
-    return res.status(201).send({ adr });
+    return res.status(201).send({ userAddress });
   } catch (error) {
     return handleHttpError(res, error, 400);
   }
@@ -36,8 +39,11 @@ async function updateUserAddress(req, res) {
 
 async function updateUserProfileImage(req, res) {
   try {
-    const { id_user } = req.user;
-    const { image } = req.files;
+    const {
+      user: { id_user },
+      files: { image },
+    } = req;
+
     if (!isImage(image.path)) {
       return handleHttpError(res, new Error('image is required'), 400);
     }

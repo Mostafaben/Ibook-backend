@@ -8,7 +8,7 @@ const { User } = require('./../models/models');
 const { hashPassword } = require('./../utils/passwordsHandler');
 
 async function createAdmin() {
-  if (await checkDefaultAdmin()) throw Error('admin already exist');
+  if (await checkDefaultAdmin()) throw Error('default admin already exist');
   return User.create({
     name: adminName,
     password: hashPassword(adminPassword),

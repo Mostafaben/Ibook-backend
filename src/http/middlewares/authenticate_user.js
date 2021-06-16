@@ -21,8 +21,9 @@ function authenticateAdmin(req, res, next) {
   try {
     let token = req.headers.authorization?.split(' ')[1];
     jwt.verify(token, token_secret, (error, user) => {
-      if (error || user.role != user_role.ADMIN)
-        return handleHttpError(res, error, 401);
+      if (error) return handleHttpError(res, error, 401);
+      if (user.role != user_role.ADMIN)
+        return handleHttpError(res, new Error('forbbidan'), 403);
       req.user = user;
       next();
     });
