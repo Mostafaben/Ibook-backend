@@ -12,15 +12,21 @@ const createOfferMiddleware = [
 
 async function isOfferOwner(req, res, next) {
   try {
-    const { id_user } = req.user;
-    const { id_offer } = req.params;
+    const {
+      params: { id_offer },
+      user: { id_user },
+    } = req;
+
     const offer = await Offer.findByPk(id_offer);
+    if (!offer) throw new Error('offer does not exists');
+
     if (offer.UserId != id_user)
       return handleHttpError(res, new Error('unauthorized'), 403);
+
     req.offer = offer;
     next();
   } catch (error) {
-    handleHttpError(res, error, 400);
+    handleHttpError(res, error, 404);
   }
 }
 

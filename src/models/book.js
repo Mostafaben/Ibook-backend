@@ -17,9 +17,6 @@ const Book = sequelize.define(
         max: 10,
       },
     },
-    author: {
-      type: DataTypes.STRING,
-    },
     state: {
       type: DataTypes.INTEGER,
       defaultValue: book_state.AVAILABLE,

@@ -8,6 +8,7 @@ const {
   Book_Images,
   Offer,
   Offer_Likes,
+  Author,
 } = require('../../models/models');
 
 const {
@@ -19,29 +20,35 @@ const PAGE_ELEMENTS = 10;
 
 async function getOffers(req, res) {
   try {
-    const { page } = req.query;
-
+    let {
+      query: { page },
+    } = req;
+    page ? page : (page = 0);
     const offers = await Offer.findAll({
       subQuery: false,
       where: {
         offer_status: offer_status.ACTIVE,
       },
-      attributes: {
-        include: [
-          [Sequelize.fn('COUNT', Sequelize.col('Offer_Likes.id')), 'likes'],
-        ],
-      },
       include: [
         {
           model: Offer_Likes,
           required: false,
-          attributes: [],
+          attributes: ['id', 'UserId', 'createdAt'],
         },
         {
           model: Book,
           required: true,
           include: [
-            { model: Book_Images, required: true, attributes: ['image_url'] },
+            {
+              model: Book_Images,
+              required: true,
+              attributes: ['image_url', 'id'],
+            },
+            {
+              model: Author,
+              required: true,
+              attributes: ['id', 'name', 'image_url'],
+            },
           ],
         },
         {
@@ -56,7 +63,9 @@ async function getOffers(req, res) {
       limit: PAGE_ELEMENTS,
       offset: page * PAGE_ELEMENTS,
     });
-    res.status(200).send({ offers, page, PAGE_ELEMENTS });
+    res
+      .status(200)
+      .send({ offers, currentPage: page, pageElements: PAGE_ELEMENTS });
   } catch (error) {
     handleHttpError(res, error, 400);
   }

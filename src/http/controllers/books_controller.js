@@ -19,8 +19,18 @@ async function getUserBooks(req, res) {
     const books = await Book.findAll({
       where: { UserId: id_user },
       attributes: { exclude: ['UserId'] },
+
       include: [
-        { model: Book_Images, required: false, attributes: ['image_url'] },
+        {
+          model: Author,
+          required: false,
+          attributes: ['name', 'id', 'image_url'],
+        },
+        {
+          model: Book_Images,
+          required: false,
+          attributes: ['image_url', 'id'],
+        },
       ],
     });
     res.status(200).send({ books });

@@ -18,7 +18,7 @@ const {
 Book.hasMany(Book_Images);
 Book.belongsTo(User);
 Author.hasMany(Book);
-
+Book.belongsTo(Author);
 // user associations
 User_Validation.belongsTo(User);
 User_Image.belongsTo(User);
