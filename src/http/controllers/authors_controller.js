@@ -15,8 +15,11 @@ async function createAuthor(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
-    const { name, resume } = req.body;
-    const { image } = req.files;
+
+    const {
+      files: { image },
+      body: { name, resume },
+    } = req;
     if (await checkIfAuthorExists(name)) throw Error('author already exists');
     let author = await Author.create({ name, resume });
     author = await storeAuthorImage(image, author);

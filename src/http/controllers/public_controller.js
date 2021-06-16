@@ -1,17 +1,16 @@
-const { handleHttpError } = require('./../../utils/error_handlers');
+const { HttpErrorHandler, HttpError } = require('./../../utils/error_handlers');
+const path = require('path');
 const FILES_PATH = './../../uploads/';
 const BOOKS_PATH = `${FILES_PATH}books/`;
 const USERS_PATH = `${FILES_PATH}/users/`;
 const AUTHORS_PATH = `${FILES_PATH}/authors/`;
-
-const path = require('path');
 
 async function getBookImage(req, res) {
   try {
     const image_path = path.join(__dirname, BOOKS_PATH + req.params.image_name);
     res.status(200).sendFile(image_path);
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, new HttpError(error.message, 404));
   }
 }
 
@@ -20,7 +19,7 @@ async function getUserImage(req, res) {
     const image_path = path.join(__dirname, USERS_PATH + req.params.image_name);
     res.status(200).sendFile(image_path);
   } catch (error) {
-    handleHttpError(res, error, 404);
+    HttpErrorHandler(res, new HttpError(error.message, 404));
   }
 }
 
@@ -32,7 +31,7 @@ async function getAuthorImage(req, res) {
     );
     res.status(200).sendFile(image_path);
   } catch (error) {
-    handleHttpError(res, error, 404);
+    HttpErrorHandler(res, new HttpError(error.message, 404));
   }
 }
 

@@ -1,17 +1,19 @@
-const { validationResult } = require('express-validator');
+const UPLOADS_PATH = './../../uploads/';
+const BOOKS_IMAGES_PATH = `${UPLOADS_PATH}books/`;
+const AUTHOR_IMAGES_PATH = `${UPLOADS_PATH}authors/`;
+const BOOK_MAX_IMAGES = 5;
 const isImage = require('is-image');
-const { Book, Book_Images } = require('../../models/book');
-const {
-  handleHttpError,
-  handleMiddlewareErrors,
-} = require('../../utils/error_handlers');
 const path = require('path');
 const fs = require('fs');
+const { validationResult } = require('express-validator');
+const { Book, Book_Images, Author } = require('../../models/models');
 const { book_image_url, author_image_url } = require('../../config/enviroment');
-const { Author } = require('../../models/author');
-const BOOKS_IMAGES_PATH = './../../uploads/books/';
-const AUTHOR_IMAGES_PATH = './../../uploads/authors/';
-const MAX_IMAGES = 5;
+const {
+  HttpErrorHr,
+  handleMiddlewareErrors,
+  HttpError,
+  HttpErrorHandler,
+} = require('../../utils/error_handlers');
 
 async function getUserBooks(req, res) {
   try {
@@ -35,7 +37,7 @@ async function getUserBooks(req, res) {
     });
     res.status(200).send({ books });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -48,36 +50,6 @@ async function addNewAuthor(authorName) {
   const author = await checkIfAuthorExists(authorName);
   if (author) return author;
   return Author.create({ name: authorName });
-}
-
-async function createAuthor(req, res) {
-  try {
-    const {
-      body: { authorName, resume },
-      files: { image },
-    } = req;
-
-    authorName = authorName.trim().toLowerCase();
-    const author = await checkIfAuthorExists(authorName);
-
-    if (author)
-      return handleHttpError(res, new Error('author already exists'), 400);
-
-    if (!image || !isImage(image.path))
-      return Author.create({ name: authorName, resume: resume });
-
-    const { imageName, outputPath } = storeAuthorImage(image, authorName);
-
-    return Author.create({
-      name: authorName,
-      resume: resume,
-      image_path: outputPath,
-      image_url: author_image_url + imageName,
-      image_name: imageName,
-    });
-  } catch (error) {
-    handleHttpError(res, error, 400);
-  }
 }
 
 function storeAuthorImage(image, authorName) {
@@ -98,21 +70,20 @@ async function addAuthorToBook(book, idAuthor) {
 
 async function createBook(req, res) {
   try {
-    const { image } = req.files;
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
-    if (!isImage(image.path))
-      return handleHttpError(res, new Error('image is required'), 400);
-    const { id_user } = req.user;
-    const { name, authorName, etat, summary } = req.body;
-
+    const {
+      files: { image },
+      user: { id_user },
+      body: { name, authorName, etat, summary },
+    } = req;
+    if (!image || !isImage(image.path))
+      throw new HttpError('image is required', 400);
     let id_author = null;
-
     if (authorName) {
       const author = await addNewAuthor(authorName);
       id_author = author.id;
     }
-
     const book = await Book.create({
       name,
       AuthorId: id_author,
@@ -120,11 +91,10 @@ async function createBook(req, res) {
       UserId: id_user,
       summary,
     });
-
     const bookImage = await addImageToBook(name, book.id, image);
     return res.status(201).send({ book, bookImage });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -151,13 +121,18 @@ async function addImageToBook(bookName, idBook, image) {
 async function deleteBookById(req, res) {
   try {
     const book = req.book;
-    const bookImage = await Book_Images.findOne({ where: { BookId: book.id } });
-    fs.unlinkSync(bookImage.image_path);
     await book.destroy();
-
+    await deleteBookImages(book.id);
     res.status(200).send({ message: 'book was deleted' });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
+  }
+}
+
+async function deleteBookImages(id_book) {
+  const bookImages = await Book_Images.findAll({ where: { BookId: id_book } });
+  for (let i = 0; i < bookImages.length; i++) {
+    fs.unlinkSync(bookImages[i].image_path);
   }
 }
 
@@ -173,7 +148,7 @@ async function updateBook(req, res) {
     await book.save();
     res.status(200).send({ book });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -184,7 +159,7 @@ async function deleteBookImage(req, res) {
     await bookImage.destroy();
     res.status(200).send({ message: 'image was deleted' });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -194,13 +169,12 @@ async function updateBookCover(req, res) {
       params: { id_book },
       files: { image },
     } = req.params;
-    if (!isImage(image.path))
-      return handleHttpError(res, new Error('image is required'), 400);
+    if (!isImage(image.path)) throw new new HttpError('image is required')();
     const bookImage = await Book_Images.findOne({ where: { BookId: id_book } });
     fs.renameSync(image.path, bookImage.image_path);
     return res.status(200).send({ bookImage });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -212,26 +186,19 @@ async function addBookImage(req, res) {
     } = req;
 
     if (!image || !isImage(image.path))
-      return handleHttpError(res, new Error('image is required'), 400);
-
+      throw new HttpError('image is required', 400);
     if (await checkBookMaxImages(id))
-      return handleHttpError(
-        res,
-        new Error('cant add new Image, max acceded'),
-        400
-      );
-
+      throw new HttpError('cant add new Image, max acceded', 400);
     const bookImage = await addImageToBook(name, id, image);
     return res.status(201).send({ bookImage });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
 async function checkBookMaxImages(idBook) {
   const images = await Book_Images.findAll({ where: { BookId: idBook } });
-  console.log(images.length == MAX_IMAGES);
-  return images.length == MAX_IMAGES;
+  return images.length == BOOK_MAX_IMAGES;
 }
 
 module.exports = {

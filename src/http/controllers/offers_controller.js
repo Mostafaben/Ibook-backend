@@ -1,5 +1,4 @@
 const { validationResult } = require('express-validator');
-const { Sequelize } = require('../../config/db_config');
 const { offer_status } = require('../../enums/enums');
 const {
   User,
@@ -10,9 +9,8 @@ const {
   Offer_Likes,
   Author,
 } = require('../../models/models');
-
 const {
-  handleHttpError,
+  HttpErrorHandler,
   handleMiddlewareErrors,
 } = require('../../utils/error_handlers');
 
@@ -67,7 +65,7 @@ async function getOffers(req, res) {
       .status(200)
       .send({ offers, currentPage: page, pageElements: PAGE_ELEMENTS });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -82,7 +80,7 @@ async function createOffer(req, res) {
     const offer = await Offer.create({ BookId, offer_type, UserId: id_user });
     return res.status(201).send({ offer });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -91,7 +89,7 @@ async function deleteOffer(req, res) {
     await req.offer.destroy();
     return res.status(200).send({ message: 'offer was deleted' });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -101,7 +99,7 @@ async function cancelOffer(req, res) {
     await offer.save();
     return res.status(200).send({ offer });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 

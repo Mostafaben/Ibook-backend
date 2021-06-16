@@ -7,7 +7,9 @@ const { port } = require('./src/config/enviroment');
 const routerIndex = require('./src/http/router');
 const formData = require('express-form-data');
 const sequelize = require('./src/config/db_config');
-const { createAdmin } = require('./src/loaders/admin_loder');
+const {
+  createAdmin: createDefaultAdmin,
+} = require('./src/loaders/admin_loder');
 
 function logSuccess(message) {
   log(chalk.green(message));
@@ -33,7 +35,7 @@ sequelize
     app.listen(port || 3000, () => {
       logSuccess(`server listening on port: ${port}`);
     });
-    createAdmin()
+    createDefaultAdmin()
       .then(() => {
         logSuccess('default admin was created successfully');
       })

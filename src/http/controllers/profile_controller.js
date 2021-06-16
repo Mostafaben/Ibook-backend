@@ -1,9 +1,10 @@
 const { validationResult } = require('express-validator');
 const isImage = require('is-image');
-const { User_Image, Address } = require('../../models/models');
+const { User_Image, Address, User } = require('../../models/models');
 const {
   handleHttpError,
   handleMiddlewareErrors,
+  HttpErrorHandler,
 } = require('../../utils/error_handlers');
 const userImagePath = './../../uploads/user/';
 const fs = require('fs');
@@ -43,10 +44,7 @@ async function updateUserProfileImage(req, res) {
       user: { id_user },
       files: { image },
     } = req;
-
-    if (!isImage(image.path)) {
-      return handleHttpError(res, new Error('image is required'), 400);
-    }
+    if (!isImage(image.path)) throw new Error('image is required');
     let userImage = await User_Image.findOne({ where: { UserId: id_user } });
     if (!userImage) {
       const image_name = id_user + path.extname(image.path);
@@ -68,4 +66,38 @@ async function updateUserProfileImage(req, res) {
   }
 }
 
-module.exports = { updateUserAddress, updateUserProfileImage };
+async function updateUserInformations(req, res) {
+  try {
+    const {
+      body: { name, address, WilayaId },
+      user: { id_user: UserId },
+    } = req;
+    const user = await User.findByPk(UserId);
+    user.name = name;
+    await user.save();
+
+    const userAddress = await Address.findOne({ where: { UserId } });
+    if (userAddress) updateUserAddress(userAddress);
+    else await createAddress(address, WilayaId, UserId);
+
+    res.status(200).send({ message: 'user was updated' });
+  } catch (error) {
+    HttpErrorHandler(res, error);
+  }
+}
+
+async function createAddress(address, WilayaId, UserId) {
+  return Address.create({ address, UserId, WilayaId });
+}
+
+async function updateUserAddress(userAddress) {
+  userAddress.WilayaId = WilayaId;
+  userAddress.address = address;
+  return userAddress.save();
+}
+
+module.exports = {
+  updateUserAddress,
+  updateUserProfileImage,
+  updateUserInformations,
+};

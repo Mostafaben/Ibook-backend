@@ -1,4 +1,8 @@
-const { handleHttpError } = require('./../../utils/error_handlers');
+const {
+  handleHttpError,
+  HttpError,
+  HttpErrorHandler,
+} = require('./../../utils/error_handlers');
 const {
   User,
   User_Image,
@@ -13,9 +17,7 @@ const PAGE_ELEMENTS = 10;
 async function getUsers(req, res) {
   try {
     let { page } = req.query;
-
     if (!page) page = 0;
-
     const users = await User.findAll({
       where: { role: { [Op.ne]: user_role.ADMIN } },
       limit: PAGE_ELEMENTS,
@@ -64,12 +66,10 @@ async function getUserInformations(req, res) {
         },
       ],
     });
-
-    if (!user)
-      return handleHttpError(res, new Error('user was not found'), 404);
+    if (!user) throw new HttpError('user was not found', 404);
     res.status(200).send({ user });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 

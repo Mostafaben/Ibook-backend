@@ -1,11 +1,9 @@
-const { offer_type } = require('../../enums/enums');
+const { HttpErrorHandler } = require('../../utils/error_handlers');
 const {
   Offer_Likes,
-  Offer,
   Offer_Sell_Respond,
   Offer_Exchange_Respond,
 } = require('../../models/offer');
-const { handleHttpError } = require('../../utils/error_handlers');
 
 async function likeOffer(req, res) {
   try {
@@ -24,7 +22,7 @@ async function likeOffer(req, res) {
     }
     res.status(200).send({ like });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -42,7 +40,7 @@ async function respondToSellOffer(req, res) {
     });
     return res.status(200).send({ offer_respond });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error, 400);
   }
 }
 
@@ -62,7 +60,7 @@ async function respondToExchangeOffer(req, res) {
 
     return res.status(200).send({ offer_respond });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error, 400);
   }
 }
 
@@ -72,7 +70,7 @@ async function deleteOfferRespondById(req, res) {
     await respond.destroy();
     return res.status(200).send({ message: 'respond was deleted' });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error, 400);
   }
 }
 
