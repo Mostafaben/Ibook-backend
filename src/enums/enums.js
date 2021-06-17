@@ -1,33 +1,30 @@
 const book_status = {
-  OLD: 0,
-  GOOD: 1,
-  NEW: 2,
-};
-const user_role = {
-  ADMIN: 0,
-  USER: 1,
-};
-
-const book_state = {
-  AVAILABLE: 0,
-  SOLD: 1,
-};
-
-const respond_status = {
-  PENDING: 0,
-  ACCEPTED: 1,
-};
-
-const offer_status = {
-  ACTIVE: 0,
-  SOLD: 1,
-  CANCELED: 2,
-};
-
-const offer_type = {
-  SELL: 0,
-  EXCHANGE: 1,
-};
+    OLD: 0,
+    GOOD: 1,
+    NEW: 2,
+  },
+  user_role = {
+    ADMIN: 0,
+    USER: 1,
+  },
+  book_state = {
+    AVAILABLE: 0,
+    SOLD: 1,
+  },
+  respond_status = {
+    PENDING: 0,
+    ACCEPTED: 1,
+  },
+  offer_status = {
+    ACTIVE: 0,
+    SOLD: 1,
+    CANCELED: 2,
+  },
+  offer_type = {
+    SELL: 0,
+    EXCHANGE: 1,
+  },
+  file_types = ['IMG', 'PDF', 'TXT', 'OTHER'];
 
 module.exports = {
   book_status,
@@ -36,4 +33,5 @@ module.exports = {
   respond_status,
   offer_status,
   offer_type,
+  file_types,
 };

@@ -12,10 +12,11 @@ const refresh_token_secret = process.env.REFRESH_TOKEN_SECRET;
 const book_image_url = `${host}:${port}/api/public/books/`;
 const author_image_url = `${host}:${port}/api/public/authors/`;
 const user_image_url = `${host}:${port}/api/public/users/`;
-const mail_port = process.env.Mail_;
-const mail_user = process.env.Mail_;
-const mail_pass = process.env.Mail_;
-const mail_host = process.env.Mail_;
+const category_image_url = `${host}:${port}/api/public/categories/`;
+const mail_port = process.env.Mail_PORT;
+const mail_user = process.env.Mail_USER;
+const mail_pass = process.env.Mail_PASS;
+const mail_host = process.env.Mail_HOST;
 const adminName = process.env.ADMIN_NAME;
 const adminEmail = process.env.ADMIN_EMAIL;
 const adminPassword = process.env.ADMIN_PASSWORD;
@@ -40,4 +41,5 @@ module.exports = {
   adminEmail,
   adminName,
   adminPassword,
+  category_image_url,
 };

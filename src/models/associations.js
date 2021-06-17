@@ -1,24 +1,32 @@
-const {
-  Book,
-  Book_Images,
-  User,
-  User_Validation,
-  User_Image,
-  Address,
-  Wilaya,
-  Offer,
-  Offer_Likes,
-  Offer_Exchange_Respond,
-  Offer_Sell_Respond,
-  User_Reset_Password,
-  Author,
-} = require('./models');
+const { Category_Image } = require('./category'),
+  {
+    Book,
+    Book_Images,
+    User,
+    User_Validation,
+    User_Image,
+    Address,
+    Wilaya,
+    Offer,
+    Offer_Likes,
+    Offer_Exchange_Respond,
+    Offer_Sell_Respond,
+    User_Reset_Password,
+    Author,
+    Category,
+  } = require('./models');
 
 // book associations
 Book.hasMany(Book_Images);
+Book_Images.belongsTo(Book);
 Book.belongsTo(User);
 Author.hasMany(Book);
 Book.belongsTo(Author);
+Book.belongsTo(Category);
+Category.hasMany(Book);
+Category.hasOne(Category_Image);
+Category_Image.belongsTo(Category);
+
 // user associations
 User_Validation.belongsTo(User);
 User_Image.belongsTo(User);

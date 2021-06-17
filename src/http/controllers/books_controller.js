@@ -1,19 +1,18 @@
-const UPLOADS_PATH = './../../uploads/';
-const BOOKS_IMAGES_PATH = `${UPLOADS_PATH}books/`;
-const AUTHOR_IMAGES_PATH = `${UPLOADS_PATH}authors/`;
-const BOOK_MAX_IMAGES = 5;
-const isImage = require('is-image');
-const path = require('path');
-const fs = require('fs');
-const { validationResult } = require('express-validator');
-const { Book, Book_Images, Author } = require('../../models/models');
-const { book_image_url, author_image_url } = require('../../config/enviroment');
-const {
-  HttpErrorHr,
-  handleMiddlewareErrors,
-  HttpError,
-  HttpErrorHandler,
-} = require('../../utils/error_handlers');
+const UPLOADS_PATH = './../../uploads/',
+  BOOKS_IMAGES_PATH = `${UPLOADS_PATH}books/`,
+  AUTHOR_IMAGES_PATH = `${UPLOADS_PATH}authors/`,
+  BOOK_MAX_IMAGES = 5,
+  isImage = require('is-image'),
+  path = require('path'),
+  fs = require('fs'),
+  { validationResult } = require('express-validator'),
+  { Book, Book_Images, Author } = require('../../models/models'),
+  { book_image_url, author_image_url } = require('../../config/enviroment'),
+  {
+    handleMiddlewareErrors,
+    HttpError,
+    HttpErrorHandler,
+  } = require('../../utils/error_handlers');
 
 async function getUserBooks(req, res) {
   try {
@@ -75,7 +74,7 @@ async function createBook(req, res) {
     const {
       files: { image },
       user: { id_user },
-      body: { name, authorName, etat, summary },
+      body: { name, authorName, etat, summary, CategoryId },
     } = req;
     if (!image || !isImage(image.path))
       throw new HttpError('image is required', 400);
@@ -90,6 +89,7 @@ async function createBook(req, res) {
       etat,
       UserId: id_user,
       summary,
+      CategoryId: CategoryId,
     });
     const bookImage = await addImageToBook(name, book.id, image);
     return res.status(201).send({ book, bookImage });

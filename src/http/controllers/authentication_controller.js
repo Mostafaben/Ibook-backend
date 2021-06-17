@@ -1,24 +1,18 @@
 const {
-  handleHttpError,
-  handleMiddlewareErrors,
-} = require('./../../utils/error_handlers');
-const { validationResult, body } = require('express-validator');
-const {
-  User,
-  User_Validation,
-  User_Reset_Password,
-} = require('../../models/models');
-const {
-  hashPassword,
-  comparePassword,
-} = require('./../../utils/passwordsHandler');
-const {
-  respondWithToken,
-  generateToken,
-} = require('../../utils/token_handler');
-const { user_role } = require('../../enums/enums');
-const { sendVerificationMail } = require('../../utils/mailing');
-const randomString = require('randomstring');
+    handleHttpError,
+    handleMiddlewareErrors,
+  } = require('./../../utils/error_handlers'),
+  { validationResult, body } = require('express-validator'),
+  {
+    User,
+    User_Validation,
+    User_Reset_Password,
+  } = require('../../models/models'),
+  { hashPassword, comparePassword } = require('./../../utils/passwordsHandler'),
+  { respondWithToken, generateToken } = require('../../utils/token_handler'),
+  { user_role } = require('../../enums/enums'),
+  { sendVerificationMail } = require('../../utils/mailing'),
+  randomString = require('randomstring');
 
 async function signUpUser(req, res) {
   try {
@@ -128,8 +122,8 @@ async function refreshUserToken(req, res) {
 //
 async function logoutUser(req, res) {
   try {
-    const { id } = req.user;
-    const user = await User.findByPk(id);
+    const { id_user } = req.user;
+    const user = await User.findByPk(id_user);
     user.refresh_token = null;
     await user.save();
     res.status(200).send({ message: 'done', success: true });

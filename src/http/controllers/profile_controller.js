@@ -4,7 +4,6 @@ const { User_Image, Address, User } = require('../../models/models');
 const {
   HttpErrorHandler,
   handleMiddlewareErrors,
-  HttpErrorHandler,
   HttpError,
 } = require('../../utils/error_handlers');
 const userImagePath = './../../uploads/user/';

@@ -1,6 +1,6 @@
-const { body } = require('express-validator');
-const { Book, Book_Images } = require('../../models/book');
-const { handleHttpError } = require('../../utils/error_handlers');
+const { body } = require('express-validator'),
+  { Book, Book_Images } = require('../../models/book'),
+  { handleHttpError } = require('../../utils/error_handlers');
 
 const createBookMiddleware = [
   body('name')

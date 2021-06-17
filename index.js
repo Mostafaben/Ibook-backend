@@ -30,7 +30,7 @@ app.use(formData.parse());
 app.use('/api', routerIndex);
 
 sequelize
-  .sync({ force: false })
+  .sync({ logging: false, force: false })
   .then(() => {
     app.listen(port || 3000, () => {
       logSuccess(`server listening on port: ${port}`);

@@ -1,38 +1,21 @@
-const { HttpErrorHandler, HttpError } = require('./../../utils/error_handlers');
-const path = require('path');
-const FILES_PATH = './../../uploads/';
-const BOOKS_PATH = `${FILES_PATH}books/`;
-const USERS_PATH = `${FILES_PATH}/users/`;
-const AUTHORS_PATH = `${FILES_PATH}/authors/`;
+const path = require('path'),
+  fs = require('fs'),
+  FILES_PATH = './../../uploads/',
+  { HttpErrorHandler, HttpError } = require('./../../utils/error_handlers');
 
-async function getBookImage(req, res) {
+async function getImage(req, res) {
   try {
-    const image_path = path.join(__dirname, BOOKS_PATH + req.params.image_name);
+    const {
+      params: { model_name, image_name },
+    } = req;
+    const fileRelativePath = `${FILES_PATH}/${model_name}/${image_name}`;
+    const image_path = path.join(__dirname, fileRelativePath);
+    if (!fs.existsSync(image_path))
+      throw new HttpError('file does not exist', 404);
     res.status(200).sendFile(image_path);
   } catch (error) {
     HttpErrorHandler(res, new HttpError(error.message, 404));
   }
 }
 
-async function getUserImage(req, res) {
-  try {
-    const image_path = path.join(__dirname, USERS_PATH + req.params.image_name);
-    res.status(200).sendFile(image_path);
-  } catch (error) {
-    HttpErrorHandler(res, new HttpError(error.message, 404));
-  }
-}
-
-async function getAuthorImage(req, res) {
-  try {
-    const image_path = path.join(
-      __dirname,
-      AUTHORS_PATH + req.params.image_name
-    );
-    res.status(200).sendFile(image_path);
-  } catch (error) {
-    HttpErrorHandler(res, new HttpError(error.message, 404));
-  }
-}
-
-module.exports = { getUserImage, getBookImage, getAuthorImage };
+module.exports = { getImage };

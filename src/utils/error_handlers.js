@@ -16,9 +16,11 @@ function handleMiddlewareErrors(res, errors, code) {
 }
 
 function HttpErrorHandler(res, error) {
-  const { code, message } = error;
+  let { code, message } = error;
   code ? code : (code = 400);
-  return res.status(code).send({ success: false, message: message });
+  return res
+    .status(code)
+    .send({ success: false, message: message, stack: error.stack });
 }
 
 module.exports = {

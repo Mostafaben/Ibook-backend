@@ -1,12 +1,6 @@
 const router = require('express').Router();
-const {
-  getBookImage,
-  getUserImage,
-  getAuthorImage,
-} = require('../controllers/public_controller');
+const { getImage } = require('../controllers/public_controller');
 
-router.get('/books/:image_name', getBookImage);
-router.get('/user/:image_name', getUserImage);
-router.get('/authors/:image_name', getAuthorImage);
+router.get('/:model_name/:image_name', getImage);
 
 module.exports = router;
