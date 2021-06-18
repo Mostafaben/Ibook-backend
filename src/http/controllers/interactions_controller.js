@@ -8,7 +8,10 @@ const {
   Offer_Sell_Respond,
   Offer_Exchange_Respond,
 } = require('../../models/offer');
-const { offer_type } = require('../../enums/enums');
+const {
+  offer_type,
+  http_reponse_code: { SUCCESS },
+} = require('../../enums/enums');
 const { validationResult } = require('express-validator');
 
 async function likeOffer(req, res) {
@@ -25,11 +28,11 @@ async function likeOffer(req, res) {
     if (like) {
       like.destroy();
       return res
-        .status(200)
+        .status(SUCCESS)
         .send({ message: 'offer was unliked', success: true });
     }
     like = await Offer_Likes.create({ UserId: id_user, OfferId: id_offer });
-    res.status(200).send({ like });
+    res.status(SUCCESS).send({ like });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -54,9 +57,9 @@ async function respondToSellOffer(req, res) {
       UserId: id_user,
     });
 
-    return res.status(200).send({ offer_respond });
+    return res.status(SUCCESS).send({ offer_respond });
   } catch (error) {
-    HttpErrorHandler(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -80,9 +83,9 @@ async function respondToExchangeOffer(req, res) {
       OfferId: id_offer,
     });
 
-    return res.status(200).send({ offer_respond });
+    return res.status(SUCCESS).send({ offer_respond });
   } catch (error) {
-    HttpErrorHandler(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -90,9 +93,9 @@ async function deleteOfferRespondById(req, res) {
   try {
     const { respond } = req;
     await respond.destroy();
-    return res.status(200).send({ message: 'respond was deleted' });
+    return res.status(SUCCESS).send({ message: 'respond was deleted' });
   } catch (error) {
-    HttpErrorHandler(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 

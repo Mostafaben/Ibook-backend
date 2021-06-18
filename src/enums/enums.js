@@ -25,7 +25,17 @@ const book_status = {
     SELL: 0,
     EXCHANGE: 1,
   },
-  file_types = ['IMG', 'PDF', 'TXT', 'OTHER'];
+  file_types = ['IMG', 'PDF', 'TXT', 'OTHER'],
+  http_reponse_code = {
+    SUCCESS: 200,
+    CREATED: 201,
+    ACCEPTED: 202,
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    INTERNAL_ERROR: 500,
+  };
 
 module.exports = {
   book_status,
@@ -35,4 +45,5 @@ module.exports = {
   offer_status,
   offer_type,
   file_types,
+  http_reponse_code,
 };

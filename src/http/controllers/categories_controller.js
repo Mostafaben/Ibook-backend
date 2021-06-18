@@ -4,7 +4,10 @@ const { category_image_url } = require('../../config/enviroment'),
   fs = require('fs'),
   { Category, Category_Image } = require('../../models/category'),
   { HttpErrorHandler, HttpError } = require('../../utils/error_handlers'),
-  CATEGORIES_ICONS_PATH = './../../uploads/categories/';
+  CATEGORIES_ICONS_PATH = './../../uploads/categories/',
+  {
+    http_reponse_code: { SUCCESS, CREATED },
+  } = require('./../../enums/enums');
 
 async function createCategory(req, res) {
   try {
@@ -16,7 +19,7 @@ async function createCategory(req, res) {
     let createdIcon;
     if (icon && isImage(icon.path))
       createdIcon = await storeCategoryIcon(name, icon, category.id);
-    return res.status(201).send({ category, createdIcon });
+    return res.status(CREATED).send({ category, createdIcon });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -33,7 +36,7 @@ async function getCategories(_, res) {
         },
       ],
     });
-    res.status(200).send({ categories });
+    res.status(SUCCESS).send({ categories });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -44,7 +47,9 @@ async function deleteCategoryById(req, res) {
     const { category } = req;
     await deleteCategoryIcon(category.id);
     await category.destroy();
-    res.status(200).send({ message: 'category was deleted', success: true });
+    res
+      .status(SUCCESS)
+      .send({ message: 'category was deleted', success: true });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -63,7 +68,7 @@ async function updateCategoryIcon(req, res) {
       icon,
       category.id
     );
-    return res.status(200).send({ updatedCategoryIcon });
+    return res.status(SUCCESS).send({ updatedCategoryIcon });
   } catch (error) {
     HttpErrorHandler(res, error);
   }

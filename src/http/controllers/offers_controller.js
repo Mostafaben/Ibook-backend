@@ -19,9 +19,8 @@ const PAGE_ELEMENTS = 10;
 async function getOffers(req, res) {
   try {
     let {
-      query: { page },
+      query: { page = 0 },
     } = req;
-    page ? page : (page = 0);
 
     const offers = await Offer.findAll({
       subQuery: false,
@@ -73,7 +72,7 @@ async function getOffers(req, res) {
 async function createOffer(req, res) {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
+    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors);
     const {
       user: { id_user },
       body: { BookId, offer_type },

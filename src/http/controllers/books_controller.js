@@ -1,3 +1,7 @@
+const {
+  http_reponse_code: { BAD_REQUEST, SUCCESS, NOT_FOUND, CREATED },
+} = require('../../enums/enums');
+
 const UPLOADS_PATH = './../../uploads/',
   BOOKS_IMAGES_PATH = `${UPLOADS_PATH}books/`,
   BOOK_MAX_IMAGES = 5,
@@ -52,7 +56,7 @@ async function getUserBooks(req, res) {
         },
       ],
     });
-    res.status(200).send({ books });
+    res.status(SUCCESS).send({ books });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -61,7 +65,8 @@ async function getUserBooks(req, res) {
 async function createBook(req, res) {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
+    if (!errors.isEmpty())
+      return handleMiddlewareErrors(res, errors, BAD_REQUEST);
 
     const {
       files: { image },
@@ -70,7 +75,7 @@ async function createBook(req, res) {
     } = req;
 
     if (!image || !isImage(image.path))
-      throw new HttpError('image is required', 400);
+      throw new HttpError('image is required');
 
     let id_author = null;
     if (authorName) {
@@ -89,28 +94,10 @@ async function createBook(req, res) {
     const bookImage = await addImageToBook(name, book.id, image);
     await storeBookCategories(categories, book.id);
 
-    return res.status(201).send({ book, bookImage });
+    return res.status(CREATED).send({ book, bookImage });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
-}
-
-async function addCategoryToBook(CategoryId, BookId) {
-  return await Book_Category.create({ CategoryId, BookId });
-}
-
-async function storeBookCategories(categories, BookId) {
-  await categories?.forEach(
-    async (category) => await addCategoryToBook(category.id, BookId)
-  );
-}
-
-function generateBookImageName(bookName, image, idBook) {
-  return bookName.replace(/ /g, '-') + idBook + path.extname(image.path);
-}
-
-function generateBookImagePath(imageName) {
-  return path.join(__dirname, BOOKS_IMAGES_PATH + imageName);
 }
 
 async function addImageToBook(bookName, idBook, image) {
@@ -130,7 +117,7 @@ async function deleteBookById(req, res) {
     const book = req.book;
     await book.destroy();
     await deleteBookImages(book.id);
-    res.status(200).send({ message: 'book was deleted' });
+    res.status(SUCCESS).send({ message: 'book was deleted' });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -153,7 +140,7 @@ async function updateBook(req, res) {
     if (name) book.name = name;
     if (AuthorId) book.AuthorId = AuthorId;
     await book.save();
-    res.status(200).send({ book });
+    res.status(SUCCESS).send({ book });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -164,14 +151,10 @@ async function deleteBookImage(req, res) {
     const { id_image } = req.params;
     const bookImage = await Book_Images.findByPk(id_image);
     await bookImage.destroy();
-    res.status(200).send({ message: 'image was deleted' });
+    res.status(SUCCESS).send({ message: 'image was deleted' });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
-}
-
-async function checkIfAuthorExists(authorName) {
-  return Author.findOne({ where: { name: authorName } });
 }
 
 async function createNewAuthor(authorName) {
@@ -179,11 +162,6 @@ async function createNewAuthor(authorName) {
   const author = await checkIfAuthorExists(authorName);
   if (author) return author;
   return Author.create({ name: authorName });
-}
-
-async function addAuthorToBook(book, idAuthor) {
-  book.AuthorId = idAuthor;
-  return book.save();
 }
 
 async function updateBookCover(req, res) {
@@ -195,7 +173,7 @@ async function updateBookCover(req, res) {
     if (!isImage(image.path)) throw new new HttpError('image is required')();
     const bookImage = await Book_Images.findOne({ where: { BookId: id_book } });
     fs.renameSync(image.path, bookImage.image_path);
-    return res.status(200).send({ bookImage });
+    return res.status(SUCCESS).send({ bookImage });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -209,11 +187,11 @@ async function addBookImage(req, res) {
     } = req;
 
     if (!image || !isImage(image.path))
-      throw new HttpError('image is required', 400);
+      throw new HttpError('image is required', BAD_REQUEST);
     if (await checkBookMaxImages(id))
-      throw new HttpError('cant add new Image, max acceded', 400);
+      throw new HttpError('cant add new Image, max acceded', BAD_REQUEST);
     const bookImage = await addImageToBook(name, id, image);
-    return res.status(201).send({ bookImage });
+    return res.status(CREATED).send({ bookImage });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -222,6 +200,33 @@ async function addBookImage(req, res) {
 async function checkBookMaxImages(idBook) {
   const images = await Book_Images.findAll({ where: { BookId: idBook } });
   return images.length == BOOK_MAX_IMAGES;
+}
+
+async function addCategoryToBook(CategoryId, BookId) {
+  return await Book_Category.create({ CategoryId, BookId });
+}
+
+async function storeBookCategories(categories, BookId) {
+  await categories?.forEach(
+    async (category) => await addCategoryToBook(category.id, BookId)
+  );
+}
+
+async function addAuthorToBook(book, idAuthor) {
+  book.AuthorId = idAuthor;
+  return book.save();
+}
+
+function generateBookImageName(bookName, image, idBook) {
+  return bookName.replace(/ /g, '-') + idBook + path.extname(image.path);
+}
+
+function generateBookImagePath(imageName) {
+  return path.join(__dirname, BOOKS_IMAGES_PATH + imageName);
+}
+
+async function checkIfAuthorExists(authorName) {
+  return Author.findOne({ where: { name: authorName } });
 }
 
 module.exports = {
