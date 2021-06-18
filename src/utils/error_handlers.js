@@ -11,7 +11,7 @@ function handleHttpError(res, error, code) {
   });
 }
 
-function handleMiddlewareErrors(res, errors, code) {
+function handleMiddlewareErrors(res, errors, code = 400) {
   return res.status(code).send({ success: false, ...errors });
 }
 

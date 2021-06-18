@@ -6,6 +6,7 @@ const book_status = {
   user_role = {
     ADMIN: 0,
     USER: 1,
+    SHOP: 2,
   },
   book_state = {
     AVAILABLE: 0,

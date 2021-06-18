@@ -1,6 +1,4 @@
 const router = require('express').Router();
-const { Offer } = require('../../models/offer');
-const { handleHttpError } = require('../../utils/error_handlers');
 const {
   likeOffer,
   respondToSellOffer,
@@ -8,17 +6,28 @@ const {
   deleteOfferRespondById,
 } = require('../controllers/interactions_controller');
 const {
-  offerExistsMiddleware,
   respondExistsMiddleware,
-} = require('../middlewares/interactions_middlewares');
+  isRespondOwnerMiddleware,
+} = require('./../middlewares/interactions_middlewares');
 
-router.get('/:id_offer', offerExistsMiddleware, likeOffer);
-router.post('/:id_offer/sell', offerExistsMiddleware, respondToSellOffer);
-router.delete('/:id_respond', respondExistsMiddleware, deleteOfferRespondById);
+const {
+  OfferExists,
+  addExchnageRespondsMiddleware,
+} = require('../middlewares/offers_middlewares');
+
+router.get('/:id_offer', OfferExists, likeOffer);
+router.post('/:id_offer/sell', OfferExists, respondToSellOffer);
 router.post(
   '/:id_offer/exchange',
-  offerExistsMiddleware,
+  addExchnageRespondsMiddleware,
+  OfferExists,
   respondToExchangeOffer
+);
+router.delete(
+  '/:id_respond',
+  respondExistsMiddleware,
+  isRespondOwnerMiddleware,
+  deleteOfferRespondById
 );
 
 module.exports = router;

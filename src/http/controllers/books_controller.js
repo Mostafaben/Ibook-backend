@@ -1,13 +1,19 @@
 const UPLOADS_PATH = './../../uploads/',
   BOOKS_IMAGES_PATH = `${UPLOADS_PATH}books/`,
-  AUTHOR_IMAGES_PATH = `${UPLOADS_PATH}authors/`,
   BOOK_MAX_IMAGES = 5,
   isImage = require('is-image'),
   path = require('path'),
   fs = require('fs'),
   { validationResult } = require('express-validator'),
-  { Book, Book_Images, Author } = require('../../models/models'),
-  { book_image_url, author_image_url } = require('../../config/enviroment'),
+  {
+    Book,
+    Book_Images,
+    Author,
+    Book_Category,
+    Category,
+    Category_Image,
+  } = require('../../models/models'),
+  { book_image_url } = require('../../config/enviroment'),
   {
     handleMiddlewareErrors,
     HttpError,
@@ -20,7 +26,6 @@ async function getUserBooks(req, res) {
     const books = await Book.findAll({
       where: { UserId: id_user },
       attributes: { exclude: ['UserId'] },
-
       include: [
         {
           model: Author,
@@ -32,6 +37,19 @@ async function getUserBooks(req, res) {
           required: false,
           attributes: ['image_url', 'id'],
         },
+        {
+          model: Category,
+          through: { attributes: [] },
+          required: false,
+          attributes: ['id', 'name'],
+          include: [
+            {
+              model: Category_Image,
+              required: false,
+              attributes: ['icon_url'],
+            },
+          ],
+        },
       ],
     });
     res.status(200).send({ books });
@@ -40,62 +58,51 @@ async function getUserBooks(req, res) {
   }
 }
 
-async function checkIfAuthorExists(authorName) {
-  return Author.findOne({ where: { name: authorName } });
-}
-
-async function addNewAuthor(authorName) {
-  authorName = authorName.trim().toLowerCase();
-  const author = await checkIfAuthorExists(authorName);
-  if (author) return author;
-  return Author.create({ name: authorName });
-}
-
-function storeAuthorImage(image, authorName) {
-  const imageName = generateUniqueAuthorName(authorName);
-  const outputPath = path.join(__dirname, AUTHOR_IMAGES_PATH + imageName);
-  fs.renameSync(image.path, outputPath);
-  return { imageName, outputPath };
-}
-
-function generateUniqueAuthorName(authorName) {
-  return authorName.replace(/ /g, '-') + Date.now() + path.extname(image.path);
-}
-
-async function addAuthorToBook(book, idAuthor) {
-  book.AuthorId = idAuthor;
-  return book.save();
-}
-
 async function createBook(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
+
     const {
       files: { image },
       user: { id_user },
-      body: { name, authorName, etat, summary, CategoryId },
+      body: { name, authorName, etat, summary, categories },
     } = req;
+
     if (!image || !isImage(image.path))
       throw new HttpError('image is required', 400);
+
     let id_author = null;
     if (authorName) {
-      const author = await addNewAuthor(authorName);
+      const author = await createNewAuthor(authorName);
       id_author = author.id;
     }
+
     const book = await Book.create({
       name,
       AuthorId: id_author,
       etat,
       UserId: id_user,
       summary,
-      CategoryId: CategoryId,
     });
+
     const bookImage = await addImageToBook(name, book.id, image);
+    await storeBookCategories(categories, book.id);
+
     return res.status(201).send({ book, bookImage });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
+}
+
+async function addCategoryToBook(CategoryId, BookId) {
+  return await Book_Category.create({ CategoryId, BookId });
+}
+
+async function storeBookCategories(categories, BookId) {
+  await categories?.forEach(
+    async (category) => await addCategoryToBook(category.id, BookId)
+  );
 }
 
 function generateBookImageName(bookName, image, idBook) {
@@ -161,6 +168,22 @@ async function deleteBookImage(req, res) {
   } catch (error) {
     HttpErrorHandler(res, error);
   }
+}
+
+async function checkIfAuthorExists(authorName) {
+  return Author.findOne({ where: { name: authorName } });
+}
+
+async function createNewAuthor(authorName) {
+  authorName = authorName.trim().toLowerCase();
+  const author = await checkIfAuthorExists(authorName);
+  if (author) return author;
+  return Author.create({ name: authorName });
+}
+
+async function addAuthorToBook(book, idAuthor) {
+  book.AuthorId = idAuthor;
+  return book.save();
 }
 
 async function updateBookCover(req, res) {

@@ -22,6 +22,7 @@ async function getOffers(req, res) {
       query: { page },
     } = req;
     page ? page : (page = 0);
+
     const offers = await Offer.findAll({
       subQuery: false,
       where: {

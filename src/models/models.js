@@ -13,7 +13,7 @@ const { Book, Book_Images } = require('./book'),
   } = require('./offer'),
   { Wilaya, Address } = require('./address'),
   { Author } = require('./author'),
-  { Category, Category_Image } = require('./category');
+  { Category, Category_Image, Book_Category } = require('./category');
 
 module.exports = {
   User,
@@ -31,4 +31,5 @@ module.exports = {
   Author,
   Category,
   Category_Image,
+  Book_Category,
 };

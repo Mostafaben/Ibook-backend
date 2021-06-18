@@ -19,4 +19,10 @@ const Category_Image = sequelize.define(
   { timestamps: true }
 );
 
-module.exports = { Category, Category_Image };
+const Book_Category = sequelize.define(
+  'Book_Category',
+  {},
+  { timestamps: true }
+);
+
+module.exports = { Category, Category_Image, Book_Category };

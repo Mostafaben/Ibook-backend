@@ -10,16 +10,23 @@ const {
 const {
   isOwner,
   createBookMiddleware,
-  isBookOwner,
+  bookExists,
+  isImageBelongsToBook,
 } = require('./../middlewares/book_middlewares');
 const router = require('express').Router();
 
 router.get('/', getUserBooks);
 router.post('/', createBookMiddleware, createBook);
-router.delete('/:id_book', isOwner, deleteBookById);
-router.patch('/:id_book', isOwner, updateBook);
-router.post('/:id_book/image', isOwner, addBookImage);
-router.patch('/:id_book/cover', isOwner, updateBookCover);
-router.delete('/image/:id_image', isBookOwner, deleteBookImage);
+router.delete('/:id_book', bookExists, isOwner, deleteBookById);
+router.patch('/:id_book', bookExists, isOwner, updateBook);
+router.post('/:id_book/image', bookExists, isOwner, addBookImage);
+router.patch('/:id_book/cover', bookExists, isOwner, updateBookCover);
+router.delete(
+  '/:id_book/image/:id_image',
+  bookExists,
+  isOwner,
+  isImageBelongsToBook,
+  deleteBookImage
+);
 
 module.exports = router;

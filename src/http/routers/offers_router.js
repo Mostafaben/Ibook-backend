@@ -8,11 +8,12 @@ const {
 const {
   createOfferMiddleware,
   isOfferOwner,
+  OfferExists,
 } = require('../middlewares/offers_middlewares');
 
 router.get('/', getOffers);
 router.post('/', createOfferMiddleware, createOffer);
-router.delete('/:id_offer', isOfferOwner, deleteOffer);
-router.patch('/:id_offer', isOfferOwner, cancelOffer);
+router.delete('/:id_offer', OfferExists, isOfferOwner, deleteOffer);
+router.patch('/:id_offer', OfferExists, isOfferOwner, cancelOffer);
 
 module.exports = router;

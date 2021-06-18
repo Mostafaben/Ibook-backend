@@ -1,6 +1,10 @@
 const { body } = require('express-validator');
 const { Offer } = require('./../../models/models');
-const { handleHttpError } = require('./../../utils/error_handlers');
+const {
+  handleHttpError,
+  HttpErrorHandler,
+  HttpError,
+} = require('./../../utils/error_handlers');
 
 const createOfferMiddleware = [
   body('BookId').isNumeric().notEmpty(),
@@ -10,27 +14,38 @@ const createOfferMiddleware = [
   }),
 ];
 
+const addExchnageRespondsMiddleware = [body('BookId').notEmpty().isNumeric()];
+
 async function isOfferOwner(req, res, next) {
   try {
     const {
-      params: { id_offer },
+      offer: { id },
       user: { id_user },
     } = req;
-
-    const offer = await Offer.findByPk(id_offer);
-    if (!offer) throw new Error('offer does not exists');
-
-    if (offer.UserId != id_user)
-      return handleHttpError(res, new Error('unauthorized'), 403);
-
-    req.offer = offer;
+    if (id != id_user) throw new HttpError('unauthorized', 403);
     next();
   } catch (error) {
     handleHttpError(res, error, 404);
   }
 }
 
+async function OfferExists(req, res, next) {
+  try {
+    const {
+      params: { id_offer },
+    } = req;
+    const offer = await Offer.findByPk(id_offer);
+    if (!offer) throw new HttpError('offer does not exit', 404);
+    req.offer = offer;
+    next();
+  } catch (error) {
+    HttpErrorHandler(res, error);
+  }
+}
+
 module.exports = {
   isOfferOwner,
   createOfferMiddleware,
+  OfferExists,
+  addExchnageRespondsMiddleware,
 };
