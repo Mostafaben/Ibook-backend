@@ -1,20 +1,19 @@
-const { validationResult } = require('express-validator');
-const { offer_status } = require('../../enums/enums');
-const {
-  User,
-  User_Image,
-  Book,
-  Book_Images,
-  Offer,
-  Offer_Likes,
-  Author,
-} = require('../../models/models');
-const {
-  HttpErrorHandler,
-  handleMiddlewareErrors,
-} = require('../../utils/error_handlers');
-
-const PAGE_ELEMENTS = 10;
+const { validationResult } = require('express-validator'),
+  { offer_status } = require('../../enums/enums'),
+  {
+    User,
+    User_Image,
+    Book,
+    Book_Images,
+    Offer,
+    Offer_Likes,
+    Author,
+  } = require('../../models/models'),
+  {
+    HttpErrorHandler,
+    handleMiddlewareErrors,
+  } = require('../../utils/error_handlers'),
+  PAGE_ELEMENTS = 10;
 
 async function getOffers(req, res) {
   try {
