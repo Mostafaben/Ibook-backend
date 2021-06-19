@@ -14,8 +14,6 @@ const createOfferMiddleware = [
   }),
 ];
 
-const addExchnageRespondsMiddleware = [body('BookId').notEmpty().isNumeric()];
-
 async function isOfferOwner(req, res, next) {
   try {
     const {
@@ -47,5 +45,4 @@ module.exports = {
   isOfferOwner,
   createOfferMiddleware,
   OfferExists,
-  addExchnageRespondsMiddleware,
 };

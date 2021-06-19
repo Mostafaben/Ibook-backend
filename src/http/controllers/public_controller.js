@@ -47,26 +47,21 @@ async function getImage(req, res) {
 async function getRecentOffers(req, res) {
   try {
     let {
-      query: { page = 0, offer_type: OfferType, BookId, AuthorId, price },
+      query: { page = 0, offer_type: OfferType, BookId, AuthorId },
     } = req;
 
     const numberOfPages = Math.ceil((await Offer.count()) / PAGE_ELEMENTS);
     const offersQuery = {};
     const booksQuery = {};
-    const sellQuery = {};
-    const authorQuery = {};
 
     if (OfferType) {
       offersQuery.offer_type = OfferType;
-      if (OfferType == offer_type.EXCHANGE && BookId) {
-        booksQuery.BookId = BookId;
-      }
-      if (offersQuery == offer_type.SELL && price) {
-        sellQuery.price = price;
-      }
+    }
+    if (BookId) {
+      offersQuery.BookId = BookId;
     }
     if (AuthorId) {
-      authorQuery.AuthorId = AuthorId;
+      booksQuery.AuthorId = AuthorId;
     }
 
     const recentOffersIncludes = [
@@ -104,7 +99,6 @@ async function getRecentOffers(req, res) {
             {
               model: Author,
               attributes: ['name'],
-              where: authorQuery,
             },
           ],
         },
@@ -120,11 +114,6 @@ async function getRecentOffers(req, res) {
               limit: 1,
             },
           ],
-        },
-        {
-          model: Offer_Sell_Respond,
-          attributes: [],
-          where: sellQuery,
         },
       ],
       limit: PAGE_ELEMENTS,
@@ -174,7 +163,7 @@ async function getAuthors(req, res) {
   }
 }
 
-async function getOfferLikes(Req, res) {
+async function getOfferLikes(req, res) {
   try {
     const {
       offer: { id: OfferId },

@@ -8,18 +8,16 @@ const {
 const {
   respondExistsMiddleware,
   isRespondOwnerMiddleware,
+  createExchangeRespondsMiddleware,
 } = require('./../middlewares/interactions_middlewares');
 
-const {
-  OfferExists,
-  addExchnageRespondsMiddleware,
-} = require('../middlewares/offers_middlewares');
+const { OfferExists } = require('../middlewares/offers_middlewares');
 
 router.get('/:id_offer', OfferExists, likeOffer);
 router.post('/:id_offer/sell', OfferExists, respondToSellOffer);
 router.post(
   '/:id_offer/exchange',
-  addExchnageRespondsMiddleware,
+  createExchangeRespondsMiddleware,
   OfferExists,
   respondToExchangeOffer
 );

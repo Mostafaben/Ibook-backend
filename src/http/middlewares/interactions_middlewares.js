@@ -1,3 +1,4 @@
+const { body } = require('express-validator');
 const {
   handleHttpError,
   HttpErrorHandler,
@@ -16,6 +17,10 @@ async function respondExistsMiddleware(req, res, next) {
   }
 }
 
+const createExchangeRespondsMiddleware = [
+  body('BookId').notEmpty().isNumeric(),
+];
+
 async function isRespondOwnerMiddleware(req, res, next) {
   try {
     const {
@@ -29,4 +34,8 @@ async function isRespondOwnerMiddleware(req, res, next) {
   }
 }
 
-module.exports = { respondExistsMiddleware, isRespondOwnerMiddleware };
+module.exports = {
+  respondExistsMiddleware,
+  isRespondOwnerMiddleware,
+  createExchangeRespondsMiddleware,
+};

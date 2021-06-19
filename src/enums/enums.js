@@ -35,6 +35,11 @@ const book_status = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     INTERNAL_ERROR: 500,
+  },
+  shop_status = {
+    PENDING: 0,
+    ACTIVE: 1,
+    BLOCKED: 2,
   };
 
 module.exports = {
@@ -46,4 +51,5 @@ module.exports = {
   offer_type,
   file_types,
   http_reponse_code,
+  shop_status,
 };
