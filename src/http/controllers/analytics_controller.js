@@ -1,4 +1,4 @@
-const { Op, DatabaseError } = require('sequelize');
+const { Op } = require('sequelize');
 const {
   user_role,
   offer_type,
@@ -66,6 +66,7 @@ async function getOffersStatistics(req, res) {
           },
         },
       });
+
       offersAnalycis.push({
         offersCount: exchangeOffersCount + sellOffersCount,
         exchangeOffersCount,
