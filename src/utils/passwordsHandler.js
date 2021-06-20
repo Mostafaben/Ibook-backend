@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt');
-const slatRounds = 10;
+const SALTS_ROUNDS = 10;
 
 function hashPassword(password) {
-  return bcrypt.hashSync(password, 10);
+  return bcrypt.hashSync(password, SALTS_ROUNDS);
 }
 
 function comparePassword(password, hashedPassword) {

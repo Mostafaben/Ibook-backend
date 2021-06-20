@@ -1,8 +1,4 @@
-const {
-  handleHttpError,
-  HttpError,
-  HttpErrorHandler,
-} = require('./../../utils/error_handlers');
+const { HttpErrorHandler, HttpError } = require('./../../utils/error_handlers');
 const {
   User,
   User_Image,
@@ -11,7 +7,10 @@ const {
   Book,
 } = require('./../../models/models');
 const { Op } = require('sequelize');
-const { user_role } = require('../../enums/enums');
+const {
+  user_role,
+  http_reponse_code: { CREATED, SUCCESS },
+} = require('../../enums/enums');
 const PAGE_ELEMENTS = 10;
 
 async function getUsers(req, res) {
@@ -32,9 +31,9 @@ async function getUsers(req, res) {
         },
       ],
     });
-    res.status(200).send({ users, PAGE_ELEMENTS, page });
+    res.status(SUCCESS).send({ users, PAGE_ELEMENTS, page });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -67,7 +66,7 @@ async function getUserInformations(req, res) {
       ],
     });
     if (!user) throw new HttpError('user was not found', 404);
-    res.status(200).send({ user });
+    res.status(SUCCESS).send({ user });
   } catch (error) {
     HttpErrorHandler(res, error);
   }

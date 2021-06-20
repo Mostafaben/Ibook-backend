@@ -1,6 +1,7 @@
 const {
-    handleHttpError,
+    HttpErrorHandler,
     handleMiddlewareErrors,
+    HttpError,
   } = require('./../../utils/error_handlers'),
   { validationResult, body } = require('express-validator'),
   {
@@ -10,7 +11,10 @@ const {
   } = require('../../models/models'),
   { hashPassword, comparePassword } = require('./../../utils/passwordsHandler'),
   { respondWithToken, generateToken } = require('../../utils/token_handler'),
-  { user_role } = require('../../enums/enums'),
+  {
+    user_role,
+    http_reponse_code: { SUCCESS, NOT_FOUND, CREATED },
+  } = require('../../enums/enums'),
   { sendVerificationMail } = require('../../utils/mailing'),
   randomString = require('randomstring');
 
@@ -18,7 +22,7 @@ async function signUpUser(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return handleMiddlewareErrors(res, errors, 400);
+      return handleMiddlewareErrors(res, errors);
     }
     const { name, email, password } = req.body;
     const user = await User.create({
@@ -29,7 +33,7 @@ async function signUpUser(req, res) {
 
     return respondWithToken(user, user_role.USER, res);
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -37,21 +41,18 @@ async function loginUser(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return handleMiddlewareErrors(res, errors, 400);
+      return handleMiddlewareErrors(res, errors);
     }
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
-    if (!user)
-      return handleHttpError(res, new Error('user was not found'), 404);
+    if (!user) throw new HttpError('user was not found', NOT_FOUND);
+
     if (!comparePassword(password, user.password))
-      return handleHttpError(
-        res,
-        new Error('not valid email or password'),
-        404
-      );
+      throw new HttpError('not valid email or password', NOT_FOUND);
+
     return respondWithToken(user, user_role.USER, res);
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -66,9 +67,9 @@ async function requestVerifyAccount(req, res) {
     await sendVerificationMail(email, name, code);
 
     // send the email
-    res.status(201).send({ message: 'code has been sent' });
+    res.status(CREATED).send({ message: 'code has been sent' });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -82,14 +83,14 @@ async function verifyAccount(req, res) {
     });
 
     if (!user_validation) {
-      return handleHttpError(res, new error('invalid code'), 400);
+      return HttpErrorHandler(res, new error('invalid code'), 400);
     }
 
     const date = new Date();
     date.setHours(date.getHours() - 2);
     if (date > user_validation.createdAt) {
       user_validation.destroy();
-      return handleHttpError(res, new Error('code expired'), 400);
+      throw new HttpError('code expired');
     }
 
     const user = await User.findByPk(id_user);
@@ -97,9 +98,9 @@ async function verifyAccount(req, res) {
     await user.save();
     await user_validation.destroy();
 
-    return res.status(200).send({ message: 'user is verified' });
+    return res.status(SUCCESS).send({ message: 'user is verified' });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -108,14 +109,13 @@ async function refreshUserToken(req, res) {
     const { refreshToken } = req.body;
     const user = await User.findOne({ where: { refresh_token: refreshToken } });
 
-    if (!user)
-      return handleHttpError(res, new Error('user was not found'), 404);
+    if (!user) throw new HttpError('user was not found', NOT_FOUND);
 
-    res.status(200).send({
+    res.status(SUCCESS).send({
       token: generateToken(user.id, user_role.USER),
     });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -126,36 +126,34 @@ async function logoutUser(req, res) {
     const user = await User.findByPk(id_user);
     user.refresh_token = null;
     await user.save();
-    res.status(200).send({ message: 'done', success: true });
+    res.status(SUCCESS).send({ message: 'done', success: true });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
 async function requestResetPassword(req, res) {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors, 400);
-
+    if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors);
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
-    if (!user)
-      return handleHttpError(res, new Error('user was not found'), 404);
+    if (!user) throw new HttpError('user was not found', NOT_FOUND);
     const code = cryptoRandomString({ length: 8 });
     await User_Reset_Password.create({
       email,
       code,
     });
-    return res.status(201).send({ message: 'check your email' });
+    return res.status(CREATED).send({ message: 'check your email' });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
 async function resetUserPassword(req, res) {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors, 400);
+    if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors);
 
     const { email, code, password } = req.body;
 
@@ -163,13 +161,12 @@ async function resetUserPassword(req, res) {
       where: { code, email },
     });
 
-    if (!password_reset_request)
-      return handleHttpError(res, new Error('unvalid code'), 400);
+    if (!password_reset_request) throw new HttpError('unvalid code');
 
     const date = new Date();
     date.setHours(date.getHours() - 2);
     if (date > password_reset_request.createdAt)
-      return handleHttpError(res, new Error('code was expired'), 400);
+      throw new HttpError('code expired');
 
     const user = await User.findOne({ where: { email } });
 
@@ -178,7 +175,7 @@ async function resetUserPassword(req, res) {
 
     return respondWithToken(user, user_role.USER, res);
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 

@@ -1,5 +1,8 @@
 const { validationResult } = require('express-validator'),
-  { offer_status } = require('../../enums/enums'),
+  {
+    offer_status,
+    http_reponse_code: { CREATED, SUCCESS },
+  } = require('../../enums/enums'),
   {
     User,
     User_Image,
@@ -61,7 +64,7 @@ async function getOffers(req, res) {
       offset: page * PAGE_ELEMENTS,
     });
     res
-      .status(200)
+      .status(SUCCESS)
       .send({ offers, currentPage: page, pageElements: PAGE_ELEMENTS });
   } catch (error) {
     HttpErrorHandler(res, error);
@@ -77,7 +80,7 @@ async function createOffer(req, res) {
       body: { BookId, offer_type },
     } = req;
     const offer = await Offer.create({ BookId, offer_type, UserId: id_user });
-    return res.status(201).send({ offer });
+    return res.status(CREATED).send({ offer });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -86,7 +89,7 @@ async function createOffer(req, res) {
 async function deleteOffer(req, res) {
   try {
     await req.offer.destroy();
-    return res.status(200).send({ message: 'offer was deleted' });
+    return res.status(SUCCESS).send({ message: 'offer was deleted' });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -96,7 +99,7 @@ async function cancelOffer(req, res) {
   try {
     req.offer.offer_status = offer_status.CANCELED;
     await offer.save();
-    return res.status(200).send({ offer });
+    return res.status(SUCCESS).send({ offer });
   } catch (error) {
     HttpErrorHandler(res, error);
   }

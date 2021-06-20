@@ -5,11 +5,7 @@ const { http_reponse_code, offer_type } = require('../../enums/enums');
 const path = require('path'),
   fs = require('fs'),
   FILES_PATH = './../../uploads/',
-  {
-    HttpErrorHandler,
-    HttpError,
-    handleHttpError,
-  } = require('./../../utils/error_handlers'),
+  { HttpErrorHandler, HttpError } = require('./../../utils/error_handlers'),
   PAGE_ELEMENTS = 10,
   {
     Offer,

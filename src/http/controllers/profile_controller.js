@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const isImage = require('is-image');
-const { User_Image, Address, User } = require('../../models/models');
+const { User_Image, Address, User, Wilaya } = require('../../models/models');
 const {
   HttpErrorHandler,
   handleMiddlewareErrors,
@@ -10,6 +10,9 @@ const userImagePath = './../../uploads/user/';
 const fs = require('fs');
 const path = require('path');
 const { user_image_url } = require('../../config/enviroment');
+const {
+  http_reponse_code: { SUCCESS, CREATED },
+} = require('../../enums/enums');
 
 async function updateUserAddress(req, res) {
   try {
@@ -32,7 +35,7 @@ async function updateUserAddress(req, res) {
         address,
       });
     }
-    return res.status(201).send({ userAddress });
+    return res.status(SUCCESS).send({ userAddress });
   } catch (error) {
     return HttpErrorHandler(res, error);
   }
@@ -48,7 +51,7 @@ async function updateUserProfileImage(req, res) {
     let userImage = await User_Image.findOne({ where: { UserId: id_user } });
     if (!userImage) await storeUserImage(image, id_user);
     else fs.renameSync(image.path, userImage.image_path);
-    return res.status(201).send({ userImage });
+    return res.status(CREATED).send({ userImage });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -81,7 +84,7 @@ async function updateUserInformations(req, res) {
     if (userAddress) updateUserAddress(userAddress);
     else await createAddress(address, WilayaId, UserId);
 
-    res.status(200).send({ message: 'user was updated' });
+    res.status(SUCCESS).send({ message: 'user was updated' });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -97,8 +100,37 @@ async function updateUserAddress(userAddress) {
   return userAddress.save();
 }
 
+async function getUserInformations(req, res) {
+  try {
+    const {
+      user: { id_user },
+    } = req;
+    const user = await User.findOne({
+      where: { id: id_user },
+      attributes: ['id', 'name', 'email', 'is_verified'],
+      include: [
+        {
+          model: User_Image,
+          required: false,
+          attributes: ['id', 'image_url'],
+        },
+        {
+          model: Address,
+          attributes: ['address', 'id'],
+          required: false,
+          include: [{ model: Wilaya, required: true, attributes: ['name'] }],
+        },
+      ],
+    });
+    res.status(SUCCESS).send(user);
+  } catch (error) {
+    HttpErrorHandler(res, error);
+  }
+}
+
 module.exports = {
   updateUserAddress,
   updateUserProfileImage,
   updateUserInformations,
+  getUserInformations,
 };

@@ -8,12 +8,6 @@ class HttpError extends Error {
     this.code = code;
   }
 }
-function handleHttpError(res, error, code) {
-  return res.status(code).send({
-    success: false,
-    message: error.message,
-  });
-}
 
 function handleMiddlewareErrors(res, errors, code = BAD_REQUEST) {
   return res.status(code).send({ success: false, ...errors });
@@ -21,14 +15,13 @@ function handleMiddlewareErrors(res, errors, code = BAD_REQUEST) {
 
 function HttpErrorHandler(res, error) {
   let { code, message } = error;
-  code ? code : (code = BAD_REQUEST);
+  if (!code) code = BAD_REQUEST;
   return res
     .status(code)
     .send({ success: false, message: message, stack: error.stack });
 }
 
 module.exports = {
-  handleHttpError,
   handleMiddlewareErrors,
   HttpErrorHandler,
   HttpError,

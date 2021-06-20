@@ -1,10 +1,9 @@
 const { body } = require('express-validator');
-const { Offer } = require('./../../models/models');
 const {
-  handleHttpError,
-  HttpErrorHandler,
-  HttpError,
-} = require('./../../utils/error_handlers');
+  http_reponse_code: { UNAUTHORIZED, NOT_FOUND },
+} = require('../../enums/enums');
+const { Offer } = require('./../../models/models');
+const { HttpErrorHandler, HttpError } = require('./../../utils/error_handlers');
 
 const createOfferMiddleware = [
   body('BookId').isNumeric().notEmpty(),
@@ -20,10 +19,10 @@ async function isOfferOwner(req, res, next) {
       offer: { id },
       user: { id_user },
     } = req;
-    if (id != id_user) throw new HttpError('unauthorized', 403);
+    if (id != id_user) throw new HttpError('unauthorized', UNAUTHORIZED);
     next();
   } catch (error) {
-    handleHttpError(res, error, 404);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -33,7 +32,7 @@ async function OfferExists(req, res, next) {
       params: { id_offer },
     } = req;
     const offer = await Offer.findByPk(id_offer);
-    if (!offer) throw new HttpError('offer does not exit', 404);
+    if (!offer) throw new HttpError('offer does not exit', NOT_FOUND);
     req.offer = offer;
     next();
   } catch (error) {

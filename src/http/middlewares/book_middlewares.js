@@ -1,10 +1,9 @@
 const { body } = require('express-validator'),
   { Book, Book_Images } = require('../../models/book'),
-  {
-    handleHttpError,
-    HttpErrorHandler,
-    HttpError,
-  } = require('../../utils/error_handlers');
+  { HttpErrorHandler, HttpError } = require('../../utils/error_handlers');
+const {
+  http_reponse_code: { NOT_FOUND, SUCCESS, UNAUTHORIZED },
+} = require('../../enums/enums');
 
 const createBookMiddleware = [
   body('name')
@@ -19,10 +18,11 @@ async function isOwner(req, res, next) {
       user: { id_user },
       book,
     } = req;
-    if (book.UserId != id_user) throw new HttpError('unauthorized', 403);
+    if (book.UserId != id_user)
+      throw new HttpError('unauthorized', UNAUTHORIZED);
     next();
   } catch (error) {
-    return handleHttpError(res, error, 400);
+    return HttpErrorHandler(res, error);
   }
 }
 
@@ -32,7 +32,7 @@ async function bookExists(req, res, next) {
       params: { id_book },
     } = req;
     const book = await Book.findByPk(id_book);
-    if (!book) throw new HttpError('book does not exits', 404);
+    if (!book) throw new HttpError('book does not exits', NOT_FOUND);
     req.book = book;
     next();
   } catch (error) {
@@ -48,11 +48,11 @@ async function isImageBelongsToBook(req, res, next) {
     } = req;
     const bookImage = await Book_Images.findByPk(id_image);
     if (bookImage.BookId != book.id)
-      throw new HttpError('image does not belong to book', 400);
+      throw new HttpError('image does not belong to book');
     req.bookImage = bookImage;
     next();
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 

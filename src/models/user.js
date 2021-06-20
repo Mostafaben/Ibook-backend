@@ -1,7 +1,6 @@
 const sequelize = require('./../config/db_config');
 const { DataTypes } = require('sequelize');
 const { user_role } = require('../enums/enums');
-const { Book } = require('./book');
 
 const User = sequelize.define(
   'User',

@@ -1,7 +1,11 @@
-const { Op } = require('sequelize');
-const { user_role, offer_type } = require('../../enums/enums');
+const { Op, DatabaseError } = require('sequelize');
+const {
+  user_role,
+  offer_type,
+  http_reponse_code: { SUCCESS },
+} = require('../../enums/enums');
 const { User, Book, Offer } = require('../../models/models');
-const { handleHttpError } = require('../../utils/error_handlers');
+const { HttpErrorHandler } = require('../../utils/error_handlers');
 
 async function getBasicAnalycis(req, res) {
   try {
@@ -15,30 +19,85 @@ async function getBasicAnalycis(req, res) {
     const exchangeOffersCount = await Offer.count({
       where: { offer_type: offer_type.EXCHANGE },
     });
-    res.status(200).send({
+
+    res.status(SUCCESS).send({
       usersCount,
       booksCount,
+      offersCount: sellOffersCount + exchangeOffersCount,
       sellOffersCount,
       exchangeOffersCount,
     });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
 async function getOffersStatistics(req, res) {
   try {
     const date = new Date();
-    const currentMonth = date.getMonth();
+
+    const {
+      query: { month = date.getMonth() + 1 },
+    } = req;
+
+    date.setMonth(month);
     const currentYear = date.getFullYear();
-    const currentDay = date.getDay();
+    const numberOfDays = getMonthDays(month, currentYear);
+    const offersAnalycis = [];
+
+    for (let i = 0; i < numberOfDays - 1; i++) {
+      const currentDate = date.setDate(i);
+      const nextDate = date.setDate(i + 1);
+      const sellOffersCount = await Offer.count({
+        where: {
+          offer_type: offer_type.SELL,
+          createdAt: {
+            [Op.gte]: currentDate,
+            [Op.lt]: nextDate,
+          },
+        },
+      });
+      const exchangeOffersCount = await Offer.count({
+        where: {
+          offer_type: offer_type.EXCHANGE,
+          createdAt: {
+            [Op.gte]: currentDate,
+            [Op.lt]: nextDate,
+          },
+        },
+      });
+      offersAnalycis.push({
+        offersCount: exchangeOffersCount + sellOffersCount,
+        exchangeOffersCount,
+        sellOffersCount,
+        date: new Date(nextDate),
+      });
+    }
+    res.status(SUCCESS).send(offersAnalycis);
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
-async function getOffersAnalycis(req, res) {}
+function getMonthDays(month, year) {
+  return new Date(month, year, 0).getDate();
+}
+
+async function getUserInteractionsAnalycis(req, res) {
+  try {
+  } catch (error) {
+    HttpErrorHandler(res, error);
+  }
+}
+
+async function getLikesCountByDay(day, month) {}
+
+async function getOffersCountByDay(day, month) {}
+
+async function getBooksCreationByDay(day, month) {}
 
 module.exports = {
   getBasicAnalycis,
+  getOffersStatistics,
+  getUserInteractionsAnalycis,
 };

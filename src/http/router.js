@@ -9,6 +9,7 @@ const router = require('express').Router(),
   profileRouter = require('./routers/profile_router'),
   authorsRouter = require('./routers/authors_router'),
   categoriesRouter = require('./routers/categories_router'),
+  analycisRouter = require('./routers/analycis_router'),
   {
     authenticateUser,
     authenticateAdmin,
@@ -17,6 +18,7 @@ const router = require('express').Router(),
 router.use('/auth/admin', adminAuthenticationRouter);
 router.use('/auth/user', authenticationRouter);
 router.use('/users', authenticateAdmin, usersRouter);
+router.use('/analycis', authenticateAdmin, analycisRouter);
 router.use('/author', authenticateAdmin, authorsRouter);
 router.use('/profile', authenticateUser, profileRouter);
 router.use('/offers', authenticateUser, offersRouter);

@@ -8,7 +8,6 @@ const inscriptionMiddleware = [
     const { password } = req.body;
     if (value != password)
       throw new Error('password confirmation is not match');
-
     return true;
   }),
 ];

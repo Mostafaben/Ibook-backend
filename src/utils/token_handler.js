@@ -5,7 +5,11 @@ const {
   refresh_token_secret,
 } = require('./../config/enviroment');
 
-const { user_role } = require('../enums/enums');
+const {
+  user_role,
+  http_reponse_code: { SUCCESS, INTERNAL_ERROR },
+} = require('../enums/enums');
+const { HttpError } = require('./error_handlers');
 
 async function respondWithToken(user, role, res) {
   const id_user = user.id;
@@ -14,9 +18,9 @@ async function respondWithToken(user, role, res) {
   const refreshToken = await generateRefreshToken(user, role);
 
   if (!refreshToken)
-    return handleHttpError(new Error('error creating refresh token', res, 500));
+    throw new HttpError('error creating refresh token', INTERNAL_ERROR);
 
-  return res.status(200).send({
+  return res.status(SUCCESS).send({
     data: {
       refreshToken: refreshToken,
       accessToken: accessToken,

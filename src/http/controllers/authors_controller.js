@@ -1,5 +1,5 @@
 const {
-  handleHttpError,
+  HttpErrorHandler,
   handleMiddlewareErrors,
 } = require('./../../utils/error_handlers');
 const { Author } = require('./../../models/models');
@@ -10,6 +10,9 @@ const { author_image_url } = require('../../config/enviroment');
 const AUTHOR_IMAGES_PATH = './../../uploads/authors/';
 
 const { validationResult } = require('express-validator');
+const {
+  http_reponse_code: { CREATED, SUCCESS },
+} = require('../../enums/enums');
 
 async function createAuthor(req, res) {
   try {
@@ -23,9 +26,9 @@ async function createAuthor(req, res) {
     if (await checkIfAuthorExists(name)) throw Error('author already exists');
     let author = await Author.create({ name, resume });
     author = await storeAuthorImage(image, author);
-    return res.status(201).send({ author });
+    return res.status(CREATED).send({ author });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res);
   }
 }
 
@@ -54,9 +57,9 @@ async function checkIfAuthorExists(authorName) {
 
 async function getAuthors(_, res) {
   try {
-    return res.status(200).send(await Author.findAll());
+    return res.status(SUCCESS).send(await Author.findAll());
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -65,9 +68,9 @@ async function getAuthorsNames(_, res) {
     const authors = await Author.findAll({
       attributes: ['name', 'id'],
     });
-    return res.status(200).send(authors);
+    return res.status(SUCCESS).send(authors);
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -80,9 +83,9 @@ async function updateAuthor(req, res) {
     author.name = name;
     author.resume = resume;
     await author.save();
-    return res.status(200).send({ author });
+    return res.status(SUCCESS).send({ author });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -90,9 +93,9 @@ async function deleteAuthor(req, res) {
   try {
     const { author } = req;
     await author.destroy();
-    return res.status(200).send({ message: 'author deleted' });
+    return res.status(SUCCESS).send({ message: 'author deleted' });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 async function addAuthorImage(req, res) {
@@ -102,9 +105,9 @@ async function addAuthorImage(req, res) {
       author,
     } = req;
     const { image_url, image_name } = await storeAuthorImage(image, author);
-    return res.status(201).send({ image_name, image_url });
+    return res.status(CREATED).send({ image_name, image_url });
   } catch (error) {
-    handleHttpError(res, error, 400);
+    HttpErrorHandler(res, error);
   }
 }
 
