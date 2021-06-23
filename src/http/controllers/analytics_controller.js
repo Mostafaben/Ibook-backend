@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const {
   user_role,
   offer_type,
-  http_reponse_code: { SUCCESS },
+  http_response_code: { SUCCESS },
 } = require('../../enums/enums');
 const { User, Book, Offer } = require('../../models/models');
 const { HttpErrorHandler } = require('../../utils/error_handlers');

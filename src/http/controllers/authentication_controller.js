@@ -13,7 +13,7 @@ const {
   { respondWithToken, generateToken } = require('../../utils/token_handler'),
   {
     user_role,
-    http_reponse_code: { SUCCESS, NOT_FOUND, CREATED },
+    http_response_code: { SUCCESS, NOT_FOUND, CREATED },
   } = require('../../enums/enums'),
   { sendVerificationMail } = require('../../utils/mailing'),
   randomString = require('randomstring');
@@ -61,12 +61,8 @@ async function requestVerifyAccount(req, res) {
     const { id_user } = req.user;
     const code = randomString.generate({ length: 8 });
     const { email, name } = await User.findByPk(id_user);
-
-    // save the code
     await User_Validation.create({ code, UserId: id_user });
     await sendVerificationMail(email, name, code);
-
-    // send the email
     res.status(CREATED).send({ message: 'code has been sent' });
   } catch (error) {
     HttpErrorHandler(res, error);
@@ -75,28 +71,26 @@ async function requestVerifyAccount(req, res) {
 
 async function verifyAccount(req, res) {
   try {
-    const { code } = req.params;
-    const { id_user } = req.user;
+    const {
+      params: { code },
+      user: { id_user },
+    } = req;
 
-    const user_validation = await User_Validation.findOne({
-      where: { UserId: id_user, code: code },
+    const userValidation = await User_Validation.findOne({
+      where: { UserId: id_user, code },
     });
-
-    if (!user_validation) {
-      return HttpErrorHandler(res, new error('invalid code'), 400);
-    }
+    if (!userValidation) throw new HttpError('invalid code');
 
     const date = new Date();
     date.setHours(date.getHours() - 2);
-    if (date > user_validation.createdAt) {
-      user_validation.destroy();
+    if (date > userValidation.createdAt) {
+      userValidation.destroy();
       throw new HttpError('code expired');
     }
-
     const user = await User.findByPk(id_user);
     user.is_verified = true;
     await user.save();
-    await user_validation.destroy();
+    await userValidation.destroy();
 
     return res.status(SUCCESS).send({ message: 'user is verified' });
   } catch (error) {
@@ -108,9 +102,7 @@ async function refreshUserToken(req, res) {
   try {
     const { refreshToken } = req.body;
     const user = await User.findOne({ where: { refresh_token: refreshToken } });
-
     if (!user) throw new HttpError('user was not found', NOT_FOUND);
-
     res.status(SUCCESS).send({
       token: generateToken(user.id, user_role.USER),
     });
@@ -119,7 +111,6 @@ async function refreshUserToken(req, res) {
   }
 }
 
-//
 async function logoutUser(req, res) {
   try {
     const { id_user } = req.user;
@@ -135,7 +126,8 @@ async function logoutUser(req, res) {
 async function requestResetPassword(req, res) {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors);
+    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors);
+
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
     if (!user) throw new HttpError('user was not found', NOT_FOUND);
@@ -154,25 +146,18 @@ async function resetUserPassword(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors);
-
     const { email, code, password } = req.body;
-
-    const password_reset_request = await User_Reset_Password.findOne({
+    const resetPasswordRequest = await User_Reset_Password.findOne({
       where: { code, email },
     });
-
-    if (!password_reset_request) throw new HttpError('unvalid code');
-
+    if (!resetPasswordRequest) throw new HttpError('invalid code');
     const date = new Date();
     date.setHours(date.getHours() - 2);
-    if (date > password_reset_request.createdAt)
+    if (date > resetPasswordRequest.createdAt)
       throw new HttpError('code expired');
-
     const user = await User.findOne({ where: { email } });
-
     user.password = hashPassword(password);
     await user.save();
-
     return respondWithToken(user, user_role.USER, res);
   } catch (error) {
     HttpErrorHandler(res, error);

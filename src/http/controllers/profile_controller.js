@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { user_image_url } = require('../../config/enviroment');
 const {
-  http_reponse_code: { SUCCESS, CREATED },
+  http_response_code: { SUCCESS, CREATED },
 } = require('../../enums/enums');
 
 async function updateUserAddress(req, res) {

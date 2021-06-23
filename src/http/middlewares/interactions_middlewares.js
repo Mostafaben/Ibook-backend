@@ -1,6 +1,6 @@
 const { body } = require('express-validator');
 const {
-  http_reponse_code: { UNAUTHORIZED, NOT_FOUND },
+  http_response_code: { UNAUTHORIZED, NOT_FOUND },
 } = require('../../enums/enums');
 const { HttpErrorHandler, HttpError } = require('../../utils/error_handlers');
 

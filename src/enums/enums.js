@@ -26,7 +26,7 @@ const book_status = {
     EXCHANGE: 1,
   },
   file_types = ['IMG', 'PDF', 'TXT', 'OTHER'],
-  http_reponse_code = {
+  http_response_code = {
     SUCCESS: 200,
     CREATED: 201,
     ACCEPTED: 202,
@@ -50,6 +50,6 @@ module.exports = {
   offer_status,
   offer_type,
   file_types,
-  http_reponse_code,
+  http_response_code,
   shop_status,
 };

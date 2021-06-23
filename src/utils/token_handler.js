@@ -1,20 +1,20 @@
 const jwt = require('jsonwebtoken');
 const {
-  token_durration,
+  token_duration,
   token_secret,
   refresh_token_secret,
 } = require('./../config/enviroment');
 
 const {
   user_role,
-  http_reponse_code: { SUCCESS, INTERNAL_ERROR },
+  http_response_code: { SUCCESS, INTERNAL_ERROR },
 } = require('../enums/enums');
 const { HttpError } = require('./error_handlers');
 
 async function respondWithToken(user, role, res) {
   const id_user = user.id;
   const accessToken = generateToken(id_user, role);
-  const expiresAt = parseInt(token_durration);
+  const expiresAt = parseInt(token_duration);
   const refreshToken = await generateRefreshToken(user, role);
 
   if (!refreshToken)
@@ -44,7 +44,7 @@ async function generateRefreshToken(user, role) {
 }
 
 function generateToken(id_user, role) {
-  const tokenDuration = parseInt(token_durration);
+  const tokenDuration = parseInt(token_duration);
   return jwt.sign(
     {
       id_user: id_user,
@@ -59,10 +59,10 @@ function generateToken(id_user, role) {
 
 function generateAdminToken(id_user) {
   return jwt.sign(
-    { id_user, role: user_role.ADMIN, expiresIn: token_durration },
+    { id_user, role: user_role.ADMIN, expiresIn: token_duration },
     token_secret,
     {
-      expiresIn: `${token_durration}s`,
+      expiresIn: `${token_duration}s`,
     }
   );
 }

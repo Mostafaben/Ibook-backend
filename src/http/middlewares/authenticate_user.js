@@ -3,7 +3,7 @@ const { HttpErrorHandler, HttpError } = require('../../utils/error_handlers'),
   jwt = require('jsonwebtoken'),
   {
     user_role,
-    http_reponse_code: { UNAUTHORIZED, FORBIDDEN },
+    http_response_code: { UNAUTHORIZED, FORBIDDEN },
   } = require('../../enums/enums');
 
 function authenticateUser(req, res, next) {

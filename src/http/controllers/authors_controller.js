@@ -11,7 +11,7 @@ const AUTHOR_IMAGES_PATH = './../../uploads/authors/';
 
 const { validationResult } = require('express-validator');
 const {
-  http_reponse_code: { CREATED, SUCCESS },
+  http_response_code: { CREATED, SUCCESS },
 } = require('../../enums/enums');
 
 async function createAuthor(req, res) {

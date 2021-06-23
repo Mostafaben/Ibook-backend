@@ -1,25 +1,26 @@
 require('dotenv').config();
+const { env } = process;
 
-const port = process.env.PORT;
-const host = process.env.HOST;
-const db_name = process.env.DB_NAME;
-const db_user = process.env.DB_USER;
-const db_pass = process.env.DB_PASS;
-const db_host = process.env.DB_HOST;
-const token_durration = process.env.TOKEN_DURRATION;
-const token_secret = process.env.TOKEN_SECRET;
-const refresh_token_secret = process.env.REFRESH_TOKEN_SECRET;
-const book_image_url = `${host}:${port}/api/public/books/`;
-const author_image_url = `${host}:${port}/api/public/authors/`;
-const user_image_url = `${host}:${port}/api/public/users/`;
-const category_image_url = `${host}:${port}/api/public/categories/`;
-const mail_port = process.env.Mail_PORT;
-const mail_user = process.env.Mail_USER;
-const mail_pass = process.env.Mail_PASS;
-const mail_host = process.env.Mail_HOST;
-const adminName = process.env.ADMIN_NAME;
-const adminEmail = process.env.ADMIN_EMAIL;
-const adminPassword = process.env.ADMIN_PASSWORD;
+const port = env.PORT,
+  host = env.HOST,
+  db_name = env.DB_NAME,
+  db_user = env.DB_USER,
+  db_pass = env.DB_PASS,
+  db_host = env.DB_HOST,
+  token_duration = env.TOKEN_DURATION,
+  token_secret = env.TOKEN_SECRET,
+  refresh_token_secret = env.REFRESH_TOKEN_SECRET,
+  mail_port = env.Mail_PORT,
+  mail_user = env.Mail_USER,
+  mail_pass = env.Mail_PASS,
+  mail_host = env.Mail_HOST,
+  adminName = env.ADMIN_NAME,
+  adminEmail = env.ADMIN_EMAIL,
+  adminPassword = env.ADMIN_PASSWORD,
+  book_image_url = `${host}:${port}/api/public/books/`,
+  author_image_url = `${host}:${port}/api/public/authors/`,
+  user_image_url = `${host}:${port}/api/public/users/`,
+  category_image_url = `${host}:${port}/api/public/categories/`;
 
 module.exports = {
   port,
@@ -28,7 +29,7 @@ module.exports = {
   db_user,
   db_pass,
   db_host,
-  token_durration,
+  token_duration,
   refresh_token_secret,
   token_secret,
   book_image_url,

@@ -1,5 +1,5 @@
 const {
-  http_reponse_code: { BAD_REQUEST },
+  http_response_code: { BAD_REQUEST },
 } = require('./../enums/enums');
 
 class HttpError extends Error {

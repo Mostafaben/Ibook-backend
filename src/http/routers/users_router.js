@@ -1,3 +1,5 @@
+const { UserExists } = require('../middlewares/users_middlewares');
+
 const router = require('express').Router(),
   {
     getUsers,
@@ -5,6 +7,6 @@ const router = require('express').Router(),
   } = require('../controllers/users_controller');
 
 router.get('/', getUsers);
-router.get('/:id_user', getUserInformations);
+router.get('/:id_user', UserExists, getUserInformations);
 
 module.exports = router;

@@ -10,7 +10,7 @@ const {
 } = require('../../models/offer');
 const {
   offer_type,
-  http_reponse_code: { SUCCESS },
+  http_response_code: { SUCCESS },
 } = require('../../enums/enums');
 const { validationResult } = require('express-validator');
 

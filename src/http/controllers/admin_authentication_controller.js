@@ -7,7 +7,7 @@ const { validationResult } = require('express-validator'),
   { User } = require('./../../models/models'),
   {
     user_role,
-    http_reponse_code: { SUCCESS, CREATED, NOT_FOUND, UNAUTHORIZED, FORBIDDEN },
+    http_response_code: { SUCCESS, NOT_FOUND, UNAUTHORIZED },
   } = require('../../enums/enums'),
   {
     generateAdminToken,
@@ -26,7 +26,7 @@ async function adminLogin(req, res) {
     if (!user) throw new HttpError('user was not found', NOT_FOUND);
 
     if (!checkIdentity(user, password))
-      throw new HttpError('unautorized', UNAUTHORIZED);
+      throw new HttpError('unauthorized', UNAUTHORIZED);
 
     const accessToken = generateAdminToken(user.id);
     const refreshToken = generateAdminRefreshToken(user.id);

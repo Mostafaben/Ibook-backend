@@ -1,6 +1,8 @@
-const { Op } = require('sequelize');
 const { Sequelize } = require('../../config/db_config');
-const { http_reponse_code, offer_type } = require('../../enums/enums');
+const {
+  http_response_code: { SUCCESS, NOT_FOUND },
+  offer_type,
+} = require('../../enums/enums');
 
 const path = require('path'),
   fs = require('fs'),
@@ -33,10 +35,10 @@ async function getImage(req, res) {
     const fileRelativePath = `${FILES_PATH}/${model_name}/${image_name}`;
     const image_path = path.join(__dirname, fileRelativePath);
     if (!fs.existsSync(image_path))
-      throw new HttpError('file does not exist', 404);
-    res.status(200).sendFile(image_path);
+      throw new HttpError('file does not exist', NOT_FOUND);
+    res.status(SUCCESS).sendFile(image_path);
   } catch (error) {
-    HttpErrorHandler(res, new HttpError(error.message, 404));
+    HttpErrorHandler(res, error);
   }
 }
 
@@ -115,7 +117,7 @@ async function getRecentOffers(req, res) {
       limit: PAGE_ELEMENTS,
       offset: PAGE_ELEMENTS * page,
     });
-    res.status(200).send({
+    res.status(SUCCESS).send({
       data: recentOffers,
       currentPage: page,
       pageElements: PAGE_ELEMENTS,
@@ -136,7 +138,7 @@ async function getCategories(req, res) {
         required: false,
       },
     });
-    res.status(http_reponse_code.SUCCESS).send(categories);
+    res.status(SUCCESS).send(categories);
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -153,7 +155,7 @@ async function getAuthors(req, res) {
       where: query,
       attributes: ['id', 'name', 'image_url'],
     });
-    res.status(http_reponse_code.SUCCESS).send(authors);
+    res.status(SUCCESS).send(authors);
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -218,7 +220,7 @@ async function getOfferResponds(req, res) {
     type == offer_type.SELL
       ? (responds = await Offer_Sell_Respond.findAll(options))
       : (responds = await Offer_Exchange_Respond.findAll(options));
-    res.status(http_reponse_code.SUCCESS).send(responds);
+    res.status(SUCCESS).send(responds);
   } catch (error) {
     HttpErrorHandler(res, error);
   }

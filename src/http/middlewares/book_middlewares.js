@@ -2,7 +2,7 @@ const { body } = require('express-validator'),
   { Book, Book_Images } = require('../../models/book'),
   { HttpErrorHandler, HttpError } = require('../../utils/error_handlers');
 const {
-  http_reponse_code: { NOT_FOUND, SUCCESS, UNAUTHORIZED },
+  http_response_code: { NOT_FOUND, SUCCESS, UNAUTHORIZED },
 } = require('../../enums/enums');
 
 const createBookMiddleware = [

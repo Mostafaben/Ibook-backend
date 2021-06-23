@@ -1,5 +1,5 @@
 const {
-  http_reponse_code: { BAD_REQUEST, SUCCESS, NOT_FOUND, CREATED },
+  http_response_code: { BAD_REQUEST, SUCCESS, NOT_FOUND, CREATED },
 } = require('../../enums/enums');
 
 const UPLOADS_PATH = './../../uploads/',
@@ -65,8 +65,7 @@ async function getUserBooks(req, res) {
 async function createBook(req, res) {
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return handleMiddlewareErrors(res, errors, BAD_REQUEST);
+    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors);
 
     const {
       files: { image },
@@ -94,7 +93,7 @@ async function createBook(req, res) {
     const bookImage = await addImageToBook(name, book.id, image);
     await storeBookCategories(categories, book.id);
 
-    return res.status(CREATED).send({ book, bookImage });
+    res.status(CREATED).send({ book, bookImage });
   } catch (error) {
     HttpErrorHandler(res, error);
   }
@@ -167,11 +166,11 @@ async function createNewAuthor(authorName) {
 async function updateBookCover(req, res) {
   try {
     const {
-      params: { id_book },
+      params: { id_book: BookId },
       files: { image },
     } = req.params;
-    if (!isImage(image.path)) throw new new HttpError('image is required')();
-    const bookImage = await Book_Images.findOne({ where: { BookId: id_book } });
+    if (!isImage(image.path)) throw new HttpError('image is required');
+    const bookImage = await Book_Images.findOne({ where: { BookId } });
     fs.renameSync(image.path, bookImage.image_path);
     return res.status(SUCCESS).send({ bookImage });
   } catch (error) {
@@ -203,7 +202,7 @@ async function checkBookMaxImages(idBook) {
 }
 
 async function addCategoryToBook(CategoryId, BookId) {
-  return await Book_Category.create({ CategoryId, BookId });
+  return Book_Category.create({ CategoryId, BookId });
 }
 
 async function storeBookCategories(categories, BookId) {

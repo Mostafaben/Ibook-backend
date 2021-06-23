@@ -6,7 +6,7 @@ const { category_image_url } = require('../../config/enviroment'),
   { HttpErrorHandler, HttpError } = require('../../utils/error_handlers'),
   CATEGORIES_ICONS_PATH = './../../uploads/categories/',
   {
-    http_reponse_code: { SUCCESS, CREATED },
+    http_response_code: { SUCCESS, CREATED },
   } = require('./../../enums/enums');
 
 async function createCategory(req, res) {

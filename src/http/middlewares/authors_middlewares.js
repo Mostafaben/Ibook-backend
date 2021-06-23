@@ -1,6 +1,6 @@
 const { body } = require('express-validator');
 const {
-  http_reponse_code: { NOT_FOUND },
+  http_response_code: { NOT_FOUND },
 } = require('../../enums/enums');
 const { Author } = require('../../models/models');
 const { HttpErrorHandler, HttpError } = require('../../utils/error_handlers');
