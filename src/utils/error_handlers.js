@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const {
   http_response_code: { BAD_REQUEST },
 } = require('./../enums/enums');
@@ -9,8 +10,10 @@ class HttpError extends Error {
   }
 }
 
-function handleMiddlewareErrors(res, errors, code = BAD_REQUEST) {
-  return res.status(code).send({ success: false, ...errors });
+function handleMiddlewareErrors(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    return res.status(BAD_REQUEST).send({ success: false, errors });
 }
 
 function HttpErrorHandler(res, error) {

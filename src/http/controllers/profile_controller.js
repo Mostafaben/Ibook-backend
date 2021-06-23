@@ -16,8 +16,7 @@ const {
 
 async function updateUserAddress(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
+    handleMiddlewareErrors(req, res);
     const {
       user: { id_user },
       body: { id_wilaya, address },

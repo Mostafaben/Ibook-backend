@@ -64,9 +64,7 @@ async function getUserBooks(req, res) {
 
 async function createBook(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors);
-
+    handleMiddlewareErrors(req, res);
     const {
       files: { image },
       user: { id_user },

@@ -16,9 +16,7 @@ const {
 
 async function createAuthor(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors, 400);
-
+    handleMiddlewareErrors(req, res);
     const {
       files: { image },
       body: { name, resume },

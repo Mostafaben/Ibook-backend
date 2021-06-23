@@ -65,9 +65,7 @@ async function respondToSellOffer(req, res) {
 
 async function respondToExchangeOffer(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors);
-
+    handleMiddlewareErrors(req, res);
     const {
       params: { id_offer },
       user: { id_user },

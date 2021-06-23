@@ -3,7 +3,7 @@ const {
     handleMiddlewareErrors,
     HttpError,
   } = require('./../../utils/error_handlers'),
-  { validationResult, body } = require('express-validator'),
+  { validationResult } = require('express-validator'),
   {
     User,
     User_Validation,
@@ -20,10 +20,7 @@ const {
 
 async function signUpUser(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return handleMiddlewareErrors(res, errors);
-    }
+    handleMiddlewareErrors(req, res);
     const { name, email, password } = req.body;
     const user = await User.create({
       name,
@@ -39,10 +36,7 @@ async function signUpUser(req, res) {
 
 async function loginUser(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return handleMiddlewareErrors(res, errors);
-    }
+    handleMiddlewareErrors(req, res);
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
     if (!user) throw new HttpError('user was not found', NOT_FOUND);
@@ -125,8 +119,7 @@ async function logoutUser(req, res) {
 
 async function requestResetPassword(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors);
+    handleMiddlewareErrors(req, res);
 
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
@@ -144,8 +137,7 @@ async function requestResetPassword(req, res) {
 
 async function resetUserPassword(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(req, errors);
+    handleMiddlewareErrors(req, res);
     const { email, code, password } = req.body;
     const resetPasswordRequest = await User_Reset_Password.findOne({
       where: { code, email },

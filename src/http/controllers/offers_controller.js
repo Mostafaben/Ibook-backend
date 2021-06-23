@@ -73,8 +73,7 @@ async function getOffers(req, res) {
 
 async function createOffer(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return handleMiddlewareErrors(res, errors);
+    handleMiddlewareErrors(req, res);
     const {
       user: { id_user },
       body: { BookId, offer_type },
