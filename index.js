@@ -32,7 +32,7 @@ app.use('/api', routerIndex);
 sequelize
   .sync({ logging: false, force: false })
   .then(() => {
-    app.listen(port, () => {
+    app.listen(() => {
       logSuccess(`server listening on port: ${port}`);
     });
     createDefaultAdmin()
