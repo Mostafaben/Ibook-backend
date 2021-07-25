@@ -1,5 +1,5 @@
-require('dotenv').config();
-const { env } = process;
+require("dotenv").config()
+const { env } = process
 
 const port = env.PORT,
   host = env.HOST,
@@ -10,7 +10,7 @@ const port = env.PORT,
   token_duration = env.TOKEN_DURATION,
   token_secret = env.TOKEN_SECRET,
   refresh_token_secret = env.REFRESH_TOKEN_SECRET,
-  mail_port = env.Mail_PORT,
+  mail_port = env.Mail_PORT || 3000,
   mail_user = env.Mail_USER,
   mail_pass = env.Mail_PASS,
   mail_host = env.Mail_HOST,
@@ -20,7 +20,7 @@ const port = env.PORT,
   book_image_url = `${host}:${port}/api/public/books/`,
   author_image_url = `${host}:${port}/api/public/authors/`,
   user_image_url = `${host}:${port}/api/public/users/`,
-  category_image_url = `${host}:${port}/api/public/categories/`;
+  category_image_url = `${host}:${port}/api/public/categories/`
 
 module.exports = {
   port,
@@ -43,4 +43,14 @@ module.exports = {
   adminName,
   adminPassword,
   category_image_url,
-};
+}
+
+/// 1dmkbGU8BN
+
+/**
+ *
+ * @dbhost : 18.221.81.73
+ * @dbname : ibook
+ * @user : root
+ * @dbport : 3306
+ */
