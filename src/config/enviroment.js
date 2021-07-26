@@ -1,7 +1,7 @@
 require("dotenv").config()
 const { env } = process
 
-const port = env.PORT,
+const port = env.PORT || 3000,
   host = env.HOST,
   db_name = env.DB_NAME,
   db_user = env.DB_USER,
@@ -10,17 +10,17 @@ const port = env.PORT,
   token_duration = env.TOKEN_DURATION,
   token_secret = env.TOKEN_SECRET,
   refresh_token_secret = env.REFRESH_TOKEN_SECRET,
-  mail_port = env.Mail_PORT || 3000,
+  mail_port = env.Mail_PORT,
   mail_user = env.Mail_USER,
   mail_pass = env.Mail_PASS,
   mail_host = env.Mail_HOST,
   adminName = env.ADMIN_NAME,
   adminEmail = env.ADMIN_EMAIL,
   adminPassword = env.ADMIN_PASSWORD,
-  book_image_url = `${host}:${port}/api/public/books/`,
-  author_image_url = `${host}:${port}/api/public/authors/`,
-  user_image_url = `${host}:${port}/api/public/users/`,
-  category_image_url = `${host}:${port}/api/public/categories/`
+  book_image_url = `${host}:${port}/api/public/resources/books/`,
+  author_image_url = `${host}:${port}/api/public/resources/authors/`,
+  user_image_url = `${host}:${port}/api/public/resources/users/`,
+  category_image_url = `${host}:${port}/api/public/resources/categories/`
 
 module.exports = {
   port,

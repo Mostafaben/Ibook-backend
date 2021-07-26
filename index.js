@@ -10,11 +10,11 @@ const sequelize = require("./src/config/db_config")
 const { createAdmin: createDefaultAdmin } = require("./src/loaders/admin_loder")
 
 function logSuccess(message) {
-  log(chalk.green(message))
+	log(chalk.green(message))
 }
 
 function logError(message) {
-  log(chalk.red(message))
+	log(chalk.red(message))
 }
 
 require("./src/models/models")
@@ -28,19 +28,20 @@ app.use(formData.parse())
 app.use("/api", routerIndex)
 
 sequelize
-  .sync({ logging: false, force: false })
-  .then(() => {
-    app.listen(() => {
-      logSuccess(`server listening on port: ${port}`)
-    })
-    createDefaultAdmin()
-      .then(() => {
-        logSuccess("default admin was created successfully")
-      })
-      .catch((error) => {
-        logError(error.message)
-      })
-  })
-  .catch((error) => {
-    logError(error.message)
-  })
+	.sync({ logging: false, force: false })
+	.then(() => {
+		app.listen(port, () => {
+			logSuccess(`server listening on port: ${port}`)
+		})
+		createDefaultAdmin()
+			.then(() => {
+				logSuccess("default admin was created successfully")
+			})
+			.catch((error) => {
+				logError(error.message)
+			})
+	})
+	.catch((error) => {
+		console.log(error)
+		logError(error.message)
+	})
