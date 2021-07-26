@@ -24,6 +24,7 @@ async function createAuthor(req, res) {
 		if (await checkIfAuthorExists(name)) throw Error("author already exists")
 		let author = await Author.create({ name, resume })
 		author = await storeAuthorImage(image, author)
+		console.log({ image, author })
 		return res.status(CREATED).send({ author })
 	} catch (error) {
 		HttpErrorHandler(res, error)
