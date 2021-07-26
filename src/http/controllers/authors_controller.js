@@ -26,7 +26,7 @@ async function createAuthor(req, res) {
 		author = await storeAuthorImage(image, author)
 		return res.status(CREATED).send({ author })
 	} catch (error) {
-		HttpErrorHandler(res)
+		HttpErrorHandler(res, error)
 	}
 }
 
